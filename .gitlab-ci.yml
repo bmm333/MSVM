@@ -10,7 +10,7 @@ cache:
 stages:
   - test
   - build
-  -
+
 test_and_coverage:
   stage: test
   script:
