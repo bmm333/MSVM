@@ -35,5 +35,5 @@ package-app:
     artifacts:
       paths:
         - msvm-studio/target/*.jar
-      needs:
+    needs:
         - job: test_and_coverage
