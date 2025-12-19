@@ -1,0 +1,39 @@
+image: maven:3.9.6-eclipse-temurin-21
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+
+stages:
+  - test
+  - build
+  -
+test_and_coverage:
+  stage: test
+  script:
+    - cd msvm-studio
+    - mvn clean verify
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print "Total Coverage:", 100*covered/instructions, "%" }' target/site/jacoco/jacoco.csv
+  coverage: '/Total Coverage: ([0-9]{1,3}\.[0-9]*)/'
+  artifacts:
+      when: always
+      reports:
+        junit: msvm-studio/target/surefire-reports/TEST-*.xml
+        coverage_report:
+          coverage_format: jacoco
+          path: msvm-studio/target/site/jacoco/jacoco.xml
+      paths:
+        - msvm-studio/target/site/jacoco/
+  package-app:
+    stage: build
+    script:
+      - cd msvm-studio
+      - mvn clean package -DskipTests #skip test in quanto gia fatti
+    artifacts:
+      paths:
+        - msvm-studio/target/*.jar
+      needs:
+        - job: test_and_coverage
