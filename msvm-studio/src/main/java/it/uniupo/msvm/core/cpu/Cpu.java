@@ -1,19 +1,15 @@
 package it.uniupo.msvm.core.cpu;
-/*
 import it.uniupo.msvm.core.instructions.Instruction;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
 import it.uniupo.msvm.core.memory.OperandStack;
 
-import che servono per il funzionamento del cpu
-Ancora da definire TODO @lucalupi -> Memory
-*/
 import java.util.Map;
 import java.util.HashMap;
 
 
 
-public class CPU{
+public class Cpu {
     private final Memory memory;
     private final OperandStack stack;
     //Registri
@@ -21,16 +17,16 @@ public class CPU{
     private boolean isHalted=false;
 
     //Strategy Map per decodificare le istruzioni.
-    private final Map<Opcode,Instruction>instructionSet=new HashMap<>();
+    private final Map<Opcode, Instruction>instructionSet=new HashMap<>();
 
     //Inject la memoria in construttore per il testing.
-    public Cpu(Memory memory,OperandStack stack) {
+    public Cpu(Memory memory, OperandStack stack) {
         this.memory = memory;
         this.stack = stack;
     }
-    public void registerInstruction(OpCode opcdoe,Instruction implementation)
+    public void registerInstruction(Opcode opcode,Instruction implementation)
     {
-        instructionSet.put(opcdoe,implementation);
+        instructionSet.put(opcode,implementation);
     }
     //Esegue tutto fino a halt oppure Errore
     public void run()
@@ -48,7 +44,7 @@ public class CPU{
 
         //1.Fetch
         //Se passa lanciera un eccezione di tipo Address out of bounds (Guarda key MSVM-5 Jira)
-        if(ip>=memory.sizeMemory())
+        if(ip>=memory.getSize())
         {
             throw new RuntimeException("Segmentation fault\n");
         }
@@ -60,10 +56,10 @@ public class CPU{
             opcode=Opcode.fromByte(opcodeByte); 
         }catch(IllegalArgumentException e)
         {
-            throw new RuntimeException("Illegal Instruction on Address:" + ip-1);
+            throw new RuntimeException("Illegal Instruction on Address:" + (ip-1));
         }
         Instruction instruction=instructionSet.get(opcode);
-        if(!instruction)
+        if(instruction==null)
         {
             throw new RuntimeException("Not implemented");
         }
@@ -71,6 +67,7 @@ public class CPU{
     }
 
     public void halt(){this.isHalted=true;}
+    public boolean isHalted(){return this.isHalted;}
     public int getIp(){return this.ip;}
-    public int setIp(int ip){this.ip=ip;}
+    public void setIp(int ip){this.ip=ip;}
 }
