@@ -7,7 +7,7 @@ import it.uniupo.msvm.core.memory.OperandStack;
 import java.util.Map;
 import java.util.HashMap;
 
-
+//Test for jira
 
 public class Cpu {
     private final Memory memory;
