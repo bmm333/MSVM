@@ -27,7 +27,7 @@ test_and_coverage:
           path: msvm-studio/target/site/jacoco/jacoco.xml
       paths:
         - msvm-studio/target/site/jacoco/
-  package-app:
+package-app:
     stage: build
     script:
       - cd msvm-studio

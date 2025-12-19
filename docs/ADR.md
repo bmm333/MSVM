@@ -14,8 +14,6 @@ ADR 002: Istruzioni del CPU
 #####       OCP: E possibile aggiungere nuove istr senza ricompilare o modificare la 'CPU'.
 #####       Testibilita: Ogni istr puo essere testata in isolamento 
 ##### Negative: Overhead: Uttilizo di risorese aumenta ( memoria: creando oggetti per ciascun istr) e un leggero overhead  del dispatch risp a Switch Case
-#####           Complesita: Aumento del numero di classi nel package `core.instructions`
+####           Complesita: Aumento del numero di classi nel package `core.instructions`
 ## Implementazione Tecnica
 ##  Si utilizzerà una classe astratta `BaseInstruction` per fattorizzare la logica comune (es. logging e toString).
-
-s
