@@ -81,7 +81,7 @@ public class Memory implements Memoryinterface{
             throw new MemoryAccessException(-1,MemoryAccessException.AccessType.EXECUTE);
         }
         else {
-            System.arraycopy(program, 0, this.data, 0, this.size);
+            System.arraycopy(program, 0, this.data, 0, program.length);
         }
 
     }
