@@ -8,7 +8,7 @@ import it.uniupo.msvm.core.exceptions.MemoryAccessException;
  * La classe implementa un interfaccia con delle istruzioni base che servono alla nostra CPU
  * per manipolare i dati presenti.
  */
-public class Memory implements Memoryinterface{
+public class Memory implements MemoryInterface{
     private final int size;
     private final int[] data;
 
@@ -77,7 +77,7 @@ public class Memory implements Memoryinterface{
      */
     @Override
     public void loadProgram(int[] program) throws MemoryAccessException {
-        if(program.length >= this.size) {
+        if(program.length > this.size) {
             throw new MemoryAccessException(-1,MemoryAccessException.AccessType.EXECUTE);
         }
         else {
