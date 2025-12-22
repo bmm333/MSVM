@@ -1,4 +1,5 @@
 package it.uniupo.msvm.core.cpu;
+import it.uniupo.msvm.core.exceptions.MemoryAccessException;
 import it.uniupo.msvm.core.instructions.Instruction;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
@@ -29,8 +30,7 @@ public class Cpu {
         instructionSet.put(opcode,implementation);
     }
     //Esegue tutto fino a halt oppure Errore
-    public void run()
-    {
+    public void run() throws MemoryAccessException {
         while(!isHalted)
         {
             step();
@@ -38,13 +38,12 @@ public class Cpu {
     }
 
     //Eseguira un step atomico (1.Fetch->2.Decode->3.Execute)
-    public void step()
-    {
+    public void step() throws MemoryAccessException {
         if(isHalted) return;
 
         //1.Fetch
         //Se passa lanciera un eccezione di tipo Address out of bounds (Guarda key MSVM-5 Jira)
-        if(ip>=memory.getSize())
+        if(ip>=memory.sizeMemory())
         {
             throw new RuntimeException("Segmentation fault\n");
         }
