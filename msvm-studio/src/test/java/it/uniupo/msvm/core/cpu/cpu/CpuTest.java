@@ -2,6 +2,7 @@ package it.uniupo.msvm.core.cpu.cpu;
 
 
 import it.uniupo.msvm.core.cpu.Cpu;
+import it.uniupo.msvm.core.exceptions.MemoryAccessException;
 import it.uniupo.msvm.core.instructions.Instruction;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
@@ -36,8 +37,7 @@ public class CpuTest {
     }
     @Test()
     @DisplayName("Fetch: IP should increment after reading opcode")
-    void testFetchIncrement()
-    {
+    void testFetchIncrement() throws MemoryAccessException {
         //Arrange
         //Registriamo istruzioni dummy (NOP-No operation) per PUSH
         cpu.registerInstruction(Opcode.PUSH,(c,m,s)->{/*do nothing*/});
@@ -50,8 +50,7 @@ public class CpuTest {
     }
     @Test
     @DisplayName("Execute: Should delegate logic to the registered Instruction")
-    void testExecutionDelegation()
-    {
+    void testExecutionDelegation() throws MemoryAccessException {
         //Arrange
         //Creiamo side-effect controllato per vedere se l'istruzione viene eseguita
         //simuliamo che l'istruzione HALT metta anche un vaore in stack
@@ -63,8 +62,7 @@ public class CpuTest {
     }
     @Test
     @DisplayName("Run Loop: Should stop when Halted flag is set")
-    void testRunLoop()
-    {
+    void testRunLoop() throws MemoryAccessException {
         Instruction nop=(c, m, s)->{};
         cpu.registerInstruction(Opcode.PUSH,nop);
         cpu.registerInstruction(Opcode.HALT, (c, m, s) -> c.halt());
@@ -88,7 +86,7 @@ public class CpuTest {
     }
     @Test
     @DisplayName("Robustness: Should throw exception on Unknown Opcode")
-    void testUnknownOpcode() {
+    void testUnknownOpcode() throws MemoryAccessException {
         // Scriviamo un byte (0xEE) che non esiste nell'Enum Opcode
         memory.write(0, 0xEE);
         assertThrows(RuntimeException.class, () -> cpu.step(),
@@ -97,7 +95,7 @@ public class CpuTest {
 
     @Test
     @DisplayName("Robustness: Should throw exception on Unimplemented Instruction")
-    void testUnimplementedInstruction() {
+    void testUnimplementedInstruction() throws MemoryAccessException {
         // Scriviamo un opcode valido (es. ADD) ma NON lo registriamo nella CPU map
         memory.write(0, Opcode.ADD.getCode());
         //non chiamo cpu.registerInstruction(Opcode.ADD, ...)
