@@ -20,7 +20,7 @@ public class Cpu {
     //Strategy Map per decodificare le istruzioni.
     private final Map<Opcode, Instruction>instructionSet=new HashMap<>();
 
-    //Inject la memoria in construttore per il testing.
+    //Inject la memoria in costruttore per il testing.
     public Cpu(Memory memory, OperandStack stack) {
         this.memory = memory;
         this.stack = stack;
@@ -37,12 +37,12 @@ public class Cpu {
         }
     }
 
-    //Eseguira un step atomico (1.Fetch->2.Decode->3.Execute)
+    //Eseguirà un step atomico (1.Fetch->2.Decode->3.Execute)
     public void step() throws MemoryAccessException {
         if(isHalted) return;
 
         //1.Fetch
-        //Se passa lanciera un eccezione di tipo Address out of bounds (Guarda key MSVM-5 Jira)
+        //Se passa lancera un eccezione di tipo Address out of bounds (Guarda key MSVM-5 Jira)
         if(ip>=memory.sizeMemory())
         {
             throw new RuntimeException("Segmentation fault\n");
