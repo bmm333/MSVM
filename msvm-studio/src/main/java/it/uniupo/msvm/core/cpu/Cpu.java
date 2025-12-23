@@ -68,8 +68,8 @@ public class Cpu implements ExecutionContext {
         if (isHalted) return;
 
         // 1. FETCH
-        if (ip < 0 || ip >= memory.getSize()) {
-            throw new MemoryAccessException("Segmentation Fault: IP out of bounds",ip, MemoryAccessException.AccessType.EXECUTE);
+        if (ip < 0 || ip >= memory.sizeMemory()) {
+            throw new MemoryAccessException("Segmentation Fault: IP out of bounds",ip, MemoryAccessException.AccessType.READ);
         }
         int opcodeByte = memory.read(ip);
         ip++; // Incremento IP dopo la lettura dell'opcode
@@ -122,7 +122,7 @@ public class Cpu implements ExecutionContext {
 
     @Override
     public int fetchNextByte() {
-        if (ip >= memory.getSize()) {
+        if (ip >= memory.sizeMemory()) {
             throw new MemoryAccessException(ip, MemoryAccessException.AccessType.READ);
         }
         int value = memory.read(ip);
@@ -142,7 +142,7 @@ public class Cpu implements ExecutionContext {
 
     @Override
     public void setIp(int address) {
-        if (address < 0 || address >= memory.getSize()) {
+        if (address < 0 || address >= memory.sizeMemory()) {
             throw new MemoryAccessException("Jump target invalido", address, MemoryAccessException.AccessType.EXECUTE);
         }
         this.ip = address;

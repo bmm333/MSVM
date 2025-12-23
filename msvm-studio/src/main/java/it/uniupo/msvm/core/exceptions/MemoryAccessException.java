@@ -1,6 +1,7 @@
 package it.uniupo.msvm.core.exceptions;
 
-public class MemoryAccessException extends  VmException{
+public class MemoryAccessException extends VmException { // Meglio Exception (Checked) di RuntimeException
+
     // Enumerazione interna per definire il tipo di operazione
     public enum AccessType {
         READ,
@@ -50,5 +51,4 @@ public class MemoryAccessException extends  VmException{
     public AccessType getType() {
         return type;
     }
-
 }

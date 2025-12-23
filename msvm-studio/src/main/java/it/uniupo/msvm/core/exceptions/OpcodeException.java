@@ -7,4 +7,8 @@ public class OpcodeException extends VmException {
         super(String.format("Unknown Opcode: 0x%02X", illegalByte));
         this.illegalByte = illegalByte;
     }
+
+    public int getIllegalByte() {
+        return illegalByte;
+    }
 }
