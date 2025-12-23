@@ -2,6 +2,8 @@ package it.uniupo.msvm.core.cpu.cpu;
 
 
 import it.uniupo.msvm.core.cpu.Cpu;
+import it.uniupo.msvm.core.exceptions.MemoryAccessException;
+import it.uniupo.msvm.core.exceptions.OpcodeException;
 import it.uniupo.msvm.core.instructions.Instruction;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
@@ -40,7 +42,7 @@ public class CpuTest {
     {
         //Arrange
         //Registriamo istruzioni dummy (NOP-No operation) per PUSH
-        cpu.registerInstruction(Opcode.PUSH,(c,m,s)->{/*do nothing*/});
+        cpu.registerInstruction(Opcode.PUSH,ctx->{/*do nothing*/});
         //Scrive lopcode in memoria all indirizzo 0
         memory.write(0,Opcode.PUSH.getCode());
         //ACT
@@ -55,8 +57,8 @@ public class CpuTest {
         //Arrange
         //Creiamo side-effect controllato per vedere se l'istruzione viene eseguita
         //simuliamo che l'istruzione HALT metta anche un vaore in stack
-        cpu.registerInstruction(Opcode.HALT,(c,m,s)->{s.push(999);//Side effect
-            c.halt(); });
+        cpu.registerInstruction(Opcode.HALT,ctx->{ctx.push(999);//Side effect
+            ctx.halt(); });
         memory.write(0,Opcode.HALT.getCode());
         cpu.step();
         assertEquals(999,stack.pop(),"La cpu deve invocare il metodo execute dell esecuzione corretta");
@@ -65,9 +67,9 @@ public class CpuTest {
     @DisplayName("Run Loop: Should stop when Halted flag is set")
     void testRunLoop()
     {
-        Instruction nop=(c, m, s)->{};
+        Instruction nop=ctx->{};
         cpu.registerInstruction(Opcode.PUSH,nop);
-        cpu.registerInstruction(Opcode.HALT, (c, m, s) -> c.halt());
+        cpu.registerInstruction(Opcode.HALT, ctx -> ctx.halt());
         memory.write(0, Opcode.PUSH.getCode());
         memory.write(1, Opcode.PUSH.getCode());
         memory.write(2, Opcode.HALT.getCode());
@@ -77,19 +79,18 @@ public class CpuTest {
     }
     @Test
     @DisplayName("Robustness: Should throw exception on Segmentation Fault")
-    void testSegmentationFault()
-    {
-        cpu.setIp(MEM_SIZE+10);
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            cpu.step();
+    void testSegmentationFault() {
+        int badAddress = MEM_SIZE + 10;
+        MemoryAccessException ex = assertThrows(MemoryAccessException.class, () -> {
+            cpu.setIp(badAddress);
         });
-        assertTrue(exception.getMessage().contains("fault") || exception.getMessage().contains("bounds"),
-                "Deve lanciare un SegFault se IP esce dalla memoria");
+
+        assertEquals(MemoryAccessException.AccessType.EXECUTE, ex.getType(),
+                "Il tipo di accesso dovrebbe essere EXECUTE (JUMP target invalido)");
     }
     @Test
     @DisplayName("Robustness: Should throw exception on Unknown Opcode")
     void testUnknownOpcode() {
-        // Scriviamo un byte (0xEE) che non esiste nell'Enum Opcode
         memory.write(0, 0xEE);
         assertThrows(RuntimeException.class, () -> cpu.step(),
                 "La CPU non deve funzionare se trova un byte che non è un opcode valido");
@@ -98,11 +99,8 @@ public class CpuTest {
     @Test
     @DisplayName("Robustness: Should throw exception on Unimplemented Instruction")
     void testUnimplementedInstruction() {
-        // Scriviamo un opcode valido (es. ADD) ma NON lo registriamo nella CPU map
         memory.write(0, Opcode.ADD.getCode());
-        //non chiamo cpu.registerInstruction(Opcode.ADD, ...)
-        Exception exception = assertThrows(RuntimeException.class, () -> cpu.step());
-        assertTrue(exception.getMessage().contains("Not implemented") || exception.getMessage().contains("null"),
-                "Deve segnalare se un opcode esiste ma non ha un'implementazione associata");
+        assertThrows(OpcodeException.class, () -> cpu.step(),
+                "Deve lanciare eccezione se l'opcode esiste in enum ma non nella map della CPU");
     }
 }

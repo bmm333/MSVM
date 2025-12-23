@@ -147,4 +147,11 @@ public class Cpu implements ExecutionContext {
         }
         this.ip = address;
     }
+    /**
+     * Restituisce lo stato di arresto della cpu
+     * Fondamentale per il loop del VmRunner e per i test
+     * */
+    public boolean isHalted() {
+        return isHalted;
+    }
 }
