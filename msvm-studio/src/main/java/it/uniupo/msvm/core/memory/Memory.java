@@ -39,6 +39,13 @@ public class Memory implements MemoryInterface{
     }
 
     /**
+     * Restituisce una copia sicura dei dati della memoria.
+     * Usiamo clone() per evitare che riferimenti esterni modifichino la RAM reale.
+     */
+    public int[] getMemoryDump() {
+        return data.clone();
+    }
+    /**
      * Istruzione write dove scrive il dato attraverso il suo address
      * @param address indirizzo di memoria che vuoi leggere
      * @param value il valore che vuoi scrivere

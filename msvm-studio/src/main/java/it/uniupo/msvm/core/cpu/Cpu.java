@@ -64,7 +64,18 @@ public class Cpu {
         }
         instruction.execute(this,memory,stack);
     }
+    public int[] getMemoryCopy() {
+        return memory.getMemoryDump();
+    }
 
+    public java.util.List<Integer> getStackCopy() {
+        return stack.getStackDump();
+    }
+
+    public int getLastWrittenAddress() {
+        // TODO: Per ora ritorniamo 0 o gestiamo la logica 'lastChanged' nella memoria in futuro
+        return 0;
+    }
     public void halt(){this.isHalted=true;}
     public boolean isHalted(){return this.isHalted;}
     public int getIp(){return this.ip;}
