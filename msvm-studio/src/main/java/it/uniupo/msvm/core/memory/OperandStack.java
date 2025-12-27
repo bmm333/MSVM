@@ -13,4 +13,8 @@ public class OperandStack {
         if (internalStack.isEmpty()) throw new RuntimeException("Stack Underflow");
         return internalStack.pop();
     }
+
+    public int peek() {
+        return internalStack.peek();
+    }
 }
