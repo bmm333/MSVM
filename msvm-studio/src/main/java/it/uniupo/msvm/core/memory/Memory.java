@@ -12,6 +12,7 @@ public class Memory implements MemoryInterface{
     private final int size;
     private final int[] data;
 
+
     /**
      * Costruttore che fa il setup della nostra memoria virtuale
      * @param size Grandezza della nostra memoria Ram
