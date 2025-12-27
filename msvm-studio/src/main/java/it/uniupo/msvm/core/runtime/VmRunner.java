@@ -1,8 +1,7 @@
 package  it.uniupo.msvm.core.runtime;
 
 import it.uniupo.msvm.core.cpu.Cpu;
-import it.uniupo.msvm.core.exceptions.VmExceptions;
-
+import it.uniupo.msvm.core.exceptions.VmException;
 public class VmRunner implements Clock,Runnable {
     private final Cpu cpu;
     private Thread workerThread;
@@ -65,7 +64,7 @@ public class VmRunner implements Clock,Runnable {
                     cpu.step();
                 }
             } catch (VmException e) {
-                System.err.println("VM CRASH: " + e.getMessage);
+                System.err.println("CPU Error: " + e.getMessage());
                 //in futuro notifichero ui per il crash
                 stop();
                 break;

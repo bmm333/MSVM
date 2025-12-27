@@ -45,28 +45,29 @@ public class VmRunnerTest {
         assertEquals(3,cpu.getIp(),"L'ip deve essere avanzato di 3 step");
     }
     @Test
-    void testPauseAndResume()throws InterruptedException{
-        memory.write(0,Opcode.PUSH.getCode());
-        //non avanzera mai oltrea a 0 se non scriviamo codice che incrementa ip
-        //ma push in cpu.java reale incrementa ip se legge argomenti
-        //qui il lambda dummy non fa nulla, quindi ip avanza solo per l'opcode
-        //simuliamo un programma lungo
-        for(int i=0;i<100;i++) memory.write(i,Opcode.PUSH.getCode());
-        //start
+    void testPauseAndResume() throws InterruptedException {
+        //Riempio la memoria
+        for(int i=0; i<100; i++) memory.write(i, Opcode.PUSH.getCode());
+        // FIX (penso che sia il mio host la causa): Rallentiamo la VM!
+        // 10 Hz = 1 istruzione ogni 100ms.
+        // Così siamo sicuri che dopo 20ms stia ancora girando.
+        runner.setFrequency(10);
+        //Start
         runner.start();
-        Thread.sleep(200);
-        assertTrue(runner.isRunning(),"Il runner dovrebbe essersi avviato dopo start()");
+        Thread.sleep(50); // Lascip correre un po' (farà mezza istruzione)
+        assertTrue(runner.isRunning(), "Il runner deve essere attivo dopo lo start");
         //pause
         runner.pause();
-        Thread.sleep(20);//dando tempo al thread di fermarsi sul wait()
-        //snapshot per vedere dove siamo
-        int ipAtPause=cpu.getIp();
-        //attendo ancora, ip non deve cambiare se sono in pause
+        Thread.sleep(20); // Diamo tempo al thread di fermarsi
+        // Prendiamo uno snapshot per vedere dove siamo
+        int ipAtPause = cpu.getIp();
+        // Aspettiamo ancora: l'IP NON deve cambiare se siamo in pausa
         Thread.sleep(50);
-        assertEquals(ipAtPause,cpu.getIp(),"L'ip non dovrebbe cambiare dopo pause()");
+        assertEquals(ipAtPause, cpu.getIp(), "L'ip non deve avanzare mentre è in pausa");
         //Resume
         runner.start();
-        Thread.sleep(20);
+        Thread.sleep(150); // Aspettiamo abbastanza per fargli fare almeno 1 step (100ms delay)
+
         assertTrue(cpu.getIp() > ipAtPause, "L'IP deve riprendere ad avanzare dopo il resume");
         // Cleanup
         runner.stop();

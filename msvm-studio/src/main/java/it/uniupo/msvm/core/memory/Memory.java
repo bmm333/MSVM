@@ -61,7 +61,6 @@ public class Memory implements MemoryInterface{
         }
     }
 
-
     /**
      * Ritorna la grandezza della memoria virtuale
      * @return restituisce la size della memoria
