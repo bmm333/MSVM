@@ -1,5 +1,7 @@
 package it.uniupo.msvm.core.cpu;
 import it.uniupo.msvm.core.exceptions.MemoryAccessException;
+import it.uniupo.msvm.core.exceptions.OpcodeException;
+import it.uniupo.msvm.core.instructions.ExecutionContext;
 import it.uniupo.msvm.core.instructions.Instruction;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
@@ -8,9 +10,15 @@ import it.uniupo.msvm.core.memory.OperandStack;
 import java.util.Map;
 import java.util.HashMap;
 
-//Test for jira
+/**
+ * Rappresentera l'unita centrale di elaborazione (CPU) dela macchina virtuale
+ * <p>
+ *     La cpu implemnta il ciclo fetch-decode-execute ed agisce come {@link it.uniupo.msvm.core.instructions.ExecutionContext }
+ *     per le istruzioni, fornendo accesso controllato a memoria e stack.
+ * </p>
+ * */
 
-public class Cpu {
+public class Cpu implements ExecutionContext {
     private final Memory memory;
     private final OperandStack stack;
     //Registri
@@ -20,53 +28,130 @@ public class Cpu {
     //Strategy Map per decodificare le istruzioni.
     private final Map<Opcode, Instruction>instructionSet=new HashMap<>();
 
-    //Inject la memoria in construttore per il testing.
+    /**
+     * Inizializza la CPU con i componenti necessari.
+     *
+     * @param memory L'istanza della memoria condivisa.
+     * @param stack  Lo stack degli operandi.
+     */
     public Cpu(Memory memory, OperandStack stack) {
         this.memory = memory;
         this.stack = stack;
     }
+    /**
+     * Registra una nuova istruzione nel set della CPU.
+     * @param opcode L'opcode associato all'istruzione.
+     * @param implementation La logica dell'istruzione.
+     */
     public void registerInstruction(Opcode opcode,Instruction implementation)
     {
         instructionSet.put(opcode,implementation);
     }
-    //Esegue tutto fino a halt oppure Errore
-    public void run() throws MemoryAccessException {
+    /**
+     * Avvia il ciclo di esecuzione continuo.
+     * Si ferma solo quando viene incontrata un'istruzione HALT o si verifica un errore critico.
+     */
+    public void run()
+    {
         while(!isHalted)
         {
             step();
         }
     }
 
-    //Eseguira un step atomico (1.Fetch->2.Decode->3.Execute)
-    public void step() throws MemoryAccessException {
-        if(isHalted) return;
+    /**
+     * Esegue un singolo ciclo Fetch-Decode-Execute (Atomico).
+     *
+     * @throws it.uniupo.msvm.core.exceptions.VmException Se si verifica un errore durante l'esecuzione (es. Memory Fault, Opcode illegale).
+     */
+    public void step() {
+        if (isHalted) return;
 
-        //1.Fetch
-        //Se passa lanciera un eccezione di tipo Address out of bounds (Guarda key MSVM-5 Jira)
-        if(ip>=memory.sizeMemory())
-        {
-            throw new RuntimeException("Segmentation fault\n");
+        // 1. FETCH
+        if (ip < 0 || ip >= memory.sizeMemory()) {
+            throw new MemoryAccessException("Segmentation Fault: IP out of bounds",ip, MemoryAccessException.AccessType.READ);
         }
-        int opcodeByte=memory.read(ip);
-        ip++; //incr puntatore
-        //2.Decode
+        int opcodeByte = memory.read(ip);
+        ip++; // Incremento IP dopo la lettura dell'opcode
+
+        // 2. DECODE
         Opcode opcode;
-        try{
-            opcode=Opcode.fromByte(opcodeByte); 
-        }catch(IllegalArgumentException e)
-        {
-            throw new RuntimeException("Illegal Instruction on Address:" + (ip-1));
+        try {
+            opcode = Opcode.fromByte(opcodeByte);
+        } catch (IllegalArgumentException e) {
+            throw new OpcodeException(opcodeByte);
         }
-        Instruction instruction=instructionSet.get(opcode);
-        if(instruction==null)
-        {
-            throw new RuntimeException("Not implemented");
+
+        Instruction instruction = instructionSet.get(opcode);
+        if (instruction == null) {
+            throw new OpcodeException(opcodeByte); // O una NotImplementedException specifica
         }
-        instruction.execute(this,memory,stack);
+
+        // 3. EXECUTE
+        // Passiamo 'this' perché Cpu implementa ExecutionContext
+        instruction.execute(this);
     }
 
-    public void halt(){this.isHalted=true;}
-    public boolean isHalted(){return this.isHalted;}
-    public int getIp(){return this.ip;}
-    public void setIp(int ip){this.ip=ip;}
+    // --- IMPLEMENTAZIONE EXECUTION CONTEXT ---
+
+    @Override
+    public void push(int value) {
+        stack.push(value);
+    }
+
+    @Override
+    public int pop() {
+        return stack.pop();
+    }
+
+    @Override
+    public int peek() {
+        return stack.peek();
+    }
+
+    @Override
+    public int readMemory(int address) {
+        // Memory.read dovrebbe già lanciare MemoryAccessException, ma per sicurezza:
+        return memory.read(address);
+    }
+
+    @Override
+    public void writeMemory(int address, int value) {
+        memory.write(address, value);
+    }
+
+    @Override
+    public int fetchNextByte() {
+        if (ip >= memory.sizeMemory()) {
+            throw new MemoryAccessException(ip, MemoryAccessException.AccessType.READ);
+        }
+        int value = memory.read(ip);
+        ip++;
+        return value;
+    }
+
+    @Override
+    public void halt() {
+        this.isHalted = true;
+    }
+
+    @Override
+    public int getIp() {
+        return ip;
+    }
+
+    @Override
+    public void setIp(int address) {
+        if (address < 0 || address >= memory.sizeMemory()) {
+            throw new MemoryAccessException("Jump target invalido", address, MemoryAccessException.AccessType.EXECUTE);
+        }
+        this.ip = address;
+    }
+    /**
+     * Restituisce lo stato di arresto della cpu
+     * Fondamentale per il loop del VmRunner e per i test
+     * */
+    public boolean isHalted() {
+        return isHalted;
+    }
 }
