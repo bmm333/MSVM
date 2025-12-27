@@ -147,6 +147,18 @@ public class Cpu implements ExecutionContext {
         }
         this.ip = address;
     }
+    public int[] getMemoryCopy() {
+        return memory.getMemoryDump();
+    }
+
+    public java.util.List<Integer> getStackCopy() {
+        return stack.getStackDump();
+    }
+
+    public int getLastWrittenAddress() {
+        // TODO: Per ora ritorniamo 0 o gestiamo la logica 'lastChanged' nella memoria in futuro
+        return 0;
+    }
     /**
      * Restituisce lo stato di arresto della cpu
      * Fondamentale per il loop del VmRunner e per i test
