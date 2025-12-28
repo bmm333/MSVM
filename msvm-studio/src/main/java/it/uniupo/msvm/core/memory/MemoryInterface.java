@@ -3,7 +3,7 @@ package it.uniupo.msvm.core.memory;
 import it.uniupo.msvm.core.exceptions.MemoryAccessException;
 
 /**
- * Classe interfaccia dove dichiaro i metodi il quale la nsota cpu puo usare
+ * Classe interfaccia dove dichiaro i metodi il quale la nostra cpu puo usare
  * per manipolare i dati della memoria virtuale
  */
 public interface MemoryInterface {

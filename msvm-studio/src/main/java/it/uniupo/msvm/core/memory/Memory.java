@@ -12,6 +12,7 @@ public class Memory implements MemoryInterface{
     private final int size;
     private final int[] data;
 
+
     /**
      * Costruttore che fa il setup della nostra memoria virtuale
      * @param size Grandezza della nostra memoria Ram
@@ -49,7 +50,7 @@ public class Memory implements MemoryInterface{
      * Istruzione write dove scrive il dato attraverso il suo address
      * @param address indirizzo di memoria che vuoi leggere
      * @param value il valore che vuoi scrivere
-     * @throws MemoryAccessException ndirizzo non valido o valore negativo o maggiore della size
+     * @throws MemoryAccessException indirizzo non valido o valore negativo o maggiore della size
      */
     @Override
     public void write(int address, int value) throws MemoryAccessException {
@@ -78,7 +79,7 @@ public class Memory implements MemoryInterface{
 
     /**
      * Carica la memoria con il programma che vuoi eseguire
-     * @param program programma con le istruzioni esdecimali
+     * @param program programma con le istruzioni esadecimali
      * @throws MemoryAccessException Programma troppo grande per la nostra memoria virtuale
      */
     @Override
