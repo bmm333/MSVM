@@ -10,7 +10,9 @@ package it.uniupo.msvm.core.instructions;
 public enum Opcode {
     PUSH(0x01),
     ADD(0x02),
-    HALT(0xFF);
+    HALT(0xFF),
+    JUMP(0x09),
+    JZ(0x10);
 
     private final int code;
 
