@@ -20,6 +20,6 @@ public interface ExecutionContext {
     void setIp(int address);
     void halt();
 
-    //Fetching argomneti
+    //Fetching argomenti
     int fetchNextByte();
 }
