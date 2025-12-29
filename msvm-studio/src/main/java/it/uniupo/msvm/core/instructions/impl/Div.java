@@ -12,7 +12,7 @@ import it.uniupo.msvm.core.instructions.Instruction;
  * <ol>
  * <li>POP operando A (Dividendo)</li>
  * <li>POP operando B (Divisore)</li>
- * <li>PUSH (A / B)</li>
+ * <li>PUSH (B / A)</li>
  * </ol>
  * * @throws ArithmeticException se il divisore (secondo pop) è 0.
  * @author Luca Lupi
@@ -26,6 +26,6 @@ public class Div implements Instruction {
         if(b==0){
             throw new ArithmeticException("Division by zero");
         }
-        ctx.push(a/b);
+        ctx.push(b/a);
     }
 }

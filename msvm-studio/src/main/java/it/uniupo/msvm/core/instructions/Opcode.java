@@ -32,6 +32,10 @@ public enum Opcode {
     SHL(0x0c),
     SHR(0x0d),
 
+    //istruzioni IF
+    IFGT(0x0e),
+    IFLT(0x0f),
+
     //istruzione stop
     HALT(0xFF);
 
