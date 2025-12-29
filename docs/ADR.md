@@ -34,3 +34,5 @@ Nel codice i commenti seguono la regola: "Commenta il perche non che cosa", quin
 4. Consequences
    -Manutenbilita: Possiamo cambiare limplementazione intera della CPU o del Threading senza rompere le istruzioni o la UI.
    -Safety: Il sistema e thread safe by design grazie agli Snapshot e all'incapsulamento del Runner.
+
+To Add : technical debt
