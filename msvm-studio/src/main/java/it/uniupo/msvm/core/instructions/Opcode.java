@@ -15,7 +15,7 @@ public enum Opcode {
     PUSH(0x01),
     POP(0x02),
 
-    //istruzioni aritmentiche
+    //istruzioni aritmetiche
     ADD(0x03),
     SUB(0x04),
     MUL(0x05),
