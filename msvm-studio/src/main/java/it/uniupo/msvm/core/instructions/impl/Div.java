@@ -23,7 +23,7 @@ public class Div implements Instruction {
     public void execute(ExecutionContext ctx) {
         int a = ctx.pop();
         int b = ctx.pop();
-        if(b==0){
+        if(a==0){
             throw new ArithmeticException("Division by zero");
         }
         ctx.push(b/a);
