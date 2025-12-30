@@ -71,10 +71,6 @@ public class Assembler {
             throw new IllegalArgumentException("Unknown instruction '" + mnemonic + "'");
         }
         bytecode.add(opcode.getCode());
-        //Gestione argoemti
-        //Alcune istruzioni richiedono argomento immediato
-        //TODO: in futuro questa logica deve essere delegata a una mappa di definizioni istruzioni
-        // per evitare hardcoding degli switch case, aumentando l'estindibilita.
         if(opcode.getArgCount()>0)
         {
             if(parts.length<2)
@@ -82,7 +78,7 @@ public class Assembler {
                 throw new IllegalArgumentException("Missing argument for '" + mnemonic + "'");
             }
             try{
-                int arg=Integer.parseInt(parts[1]);
+                int arg=Integer.decode(parts[1]);
                 bytecode.add(arg);
             }catch (NumberFormatException e)
             {

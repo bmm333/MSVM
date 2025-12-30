@@ -7,9 +7,6 @@
 
 package it.uniupo.msvm.core.instructions;
 
-import lombok.Getter;
-
-@Getter
 public enum Opcode {
     //istruzioni stack
     PUSH(0x01,1),
@@ -53,5 +50,13 @@ public enum Opcode {
             if (op.code == code) return op;
         }
         throw new IllegalArgumentException("Unknown Opcode: " + code);
+    }
+    //Manual getters invece di lombok che causa errori
+    public int getCode() {
+        return code;
+    }
+
+    public int getArgCount() {
+        return argCount;
     }
 }
