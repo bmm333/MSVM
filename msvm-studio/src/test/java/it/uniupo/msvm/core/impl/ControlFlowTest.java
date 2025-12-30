@@ -42,7 +42,7 @@ public class ControlFlowTest extends InstructionTestBase {
 
         new Jump().execute(ctx);
 
-        assertEquals(17, cpu.getIp(), "L'IP deve avanzare a 17 (11 + 1 + 5)");
+        assertEquals(16, cpu.getIp(), "L'IP deve avanzare a 16 (11 + 5)");
     }
 
     /**
@@ -55,7 +55,7 @@ public class ControlFlowTest extends InstructionTestBase {
      * </ul>
      * <strong>Calcolo atteso:</strong>
      * <br>
-     * <code>(21 + 1) - 5 = 17</code>
+     * <code>21- 5 = 16</code>
      * </p>
      */
     @Test
@@ -66,7 +66,7 @@ public class ControlFlowTest extends InstructionTestBase {
 
         new Jump().execute(ctx);
 
-        assertEquals(17, cpu.getIp(), "L'IP dovrebbe essere tornato indietro a 17");
+        assertEquals(16, cpu.getIp(), "L'IP dovrebbe essere tornato indietro a 16");
     }
 
     /**
@@ -87,7 +87,7 @@ public class ControlFlowTest extends InstructionTestBase {
 
         new Jz().execute(ctx);
 
-        assertEquals(17, cpu.getIp(), "Doveva saltare a 17 perché lo stack aveva 0");
+        assertEquals(16, cpu.getIp(), "Doveva saltare a 16 perché lo stack aveva 0");
         assertTrue(cpu.getStackCopy().isEmpty(), "JZ deve consumare il valore dallo stack (pop)");
     }
 

@@ -37,7 +37,7 @@ public class IfTest extends InstructionTestBase{
         // Deve saltare: IP = (10 + 1) + 5 = 16 (oppure 17 se fetchNextByte incrementa prima)
         // Verifichiamo la tua logica: fetchNextByte() porta IP a 11. Poi 11 + 5 = 16.
         // Se hai corretto fetchNextByte come suggerito, l'IP base è quello DOPO l'argomento.
-        assertEquals(17, cpu.getIp(), "20 > 10 è vero, doveva saltare (+5)");
+        assertEquals(16, cpu.getIp(), "20 > 10 è vero, doveva saltare (+5)");
         assertTrue(cpu.getStackCopy().isEmpty(), "Deve consumare i due operandi dallo stack");
     }
 
@@ -85,7 +85,7 @@ public class IfTest extends InstructionTestBase{
         new Iflt().execute(ctx);
 
         // VERIFY
-        assertEquals(17, cpu.getIp(), "10 < 20 è vero, doveva saltare");
+        assertEquals(16, cpu.getIp(), "10 < 20 è vero, doveva saltare");
     }
 
     /**

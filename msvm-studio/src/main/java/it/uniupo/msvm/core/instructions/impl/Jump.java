@@ -23,6 +23,6 @@ public class Jump implements Instruction {
     public void execute(ExecutionContext ctx) {
         int jump=ctx.fetchNextByte();
         int ip= ctx.getIp();
-        ctx.setIp((ip+1)+jump);
+        ctx.setIp(ip+jump);
     }
 }

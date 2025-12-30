@@ -24,7 +24,7 @@ public class Jz implements Instruction {
         if(a == 0){
             int jump=ctx.fetchNextByte();
             int ip= ctx.getIp();
-            ctx.setIp((ip+1)+jump);
+            ctx.setIp(ip+jump);
         }
     }
 }

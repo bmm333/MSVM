@@ -29,7 +29,7 @@ public class Ifgt implements Instruction {
         if(b>a){
 
             int ip= ctx.getIp();
-            ctx.setIp((ip+1)+jump);
+            ctx.setIp(ip+jump);
         }
     }
 }
