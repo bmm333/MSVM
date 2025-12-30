@@ -75,18 +75,18 @@ public class Assembler {
         //Alcune istruzioni richiedono argomento immediato
         //TODO: in futuro questa logica deve essere delegata a una mappa di definizioni istruzioni
         // per evitare hardcoding degli switch case, aumentando l'estindibilita.
-        boolean requiresArgument = (opcode == Opcode.PUSH || opcode == Opcode.JUMP || opcode == Opcode.JZ);
-
-        if (requiresArgument) {
-            if (parts.length < 2) {
-                throw new IllegalArgumentException(mnemonic + " requires an argument");
+        if(opcode.getArgCount()>0)
+        {
+            if(parts.length<2)
+            {
+                throw new IllegalArgumentException("Missing argument for '" + mnemonic + "'");
             }
-            try {
-                // Supporto per esadecimali (0x) e decimali
-                int arg = Integer.decode(parts[1]);
+            try{
+                int arg=Integer.parseInt(parts[1]);
                 bytecode.add(arg);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid number format: " + parts[1]);
+            }catch (NumberFormatException e)
+            {
+                throw new IllegalArgumentException("Invalid number format: "+ parts[1]);
             }
         }
     }
