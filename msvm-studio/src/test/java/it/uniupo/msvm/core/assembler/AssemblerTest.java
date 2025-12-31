@@ -97,4 +97,67 @@ class AssemblerTest {
     void testMissingArgument() {
         assertThrows(VmException.class, () -> assembler.assemble("PUSH"));
     }
+    //Test per il v2.0
+    @Test
+    void testLabelsBackwardReference() {
+        // Test Fondamentale 1: Salto all'indietro (Loop)
+        // START: (addr 0)
+        //   PUSH 10 (addr 0, 1)
+        //   JUMP START (addr 2, 3) -> Deve saltare a 0
+        String source = """
+            START:
+            PUSH 10
+            JUMP START
+            """;
+
+        int[] bytecode = assembler.assemble(source);
+
+        assertEquals(4, bytecode.length);
+        assertEquals(Opcode.JUMP.getCode(), bytecode[2]);
+        assertEquals(0, bytecode[3], "La label START deve risolversi all'indirizzo 0");
+    }
+
+    @Test
+    void testLabelsForwardReference() {
+        // Test Fondamentale 2: Salto in avanti (Il vero motivo del Two-Pass)
+        //   JUMP FINE (addr 0, 1) -> Deve saltare a 4
+        //   PUSH 5    (addr 2, 3)
+        // FINE:
+        //   HALT      (addr 4)
+        String source = """
+            JUMP FINE
+            PUSH 5
+            FINE:
+            HALT
+            """;
+
+        int[] bytecode = assembler.assemble(source);
+        assertEquals(5, bytecode.length); // 2(JUMP) + 2(PUSH) + 1(HALT)
+        assertEquals(Opcode.JUMP.getCode(), bytecode[0]);
+        assertEquals(4, bytecode[1], "La label FINE deve risolversi all'indirizzo 4 (Forward Jump)");
+        assertEquals(Opcode.HALT.getCode(), bytecode[4]);
+    }
+    @Test
+    void testUndefinedLabel() {
+        // Test Robustezza: Cosa succede se salto a una label che non esiste?
+        String source = "JUMP NONESISTE";
+
+        VmException ex = assertThrows(VmException.class, () -> {
+            assembler.assemble(source);
+        });
+        assertTrue(ex.getMessage().contains("Undefined label"), "Deve segnalare che la label non esiste");
+    }
+
+    @Test
+    void testLabelCaseInsensitivity() {
+        // Test Usabilità: Loop: e JUMP LOOP devono matchare
+        String source = """
+            Loop:
+            PUSH 1
+            JUMP LOOP
+            """;
+
+        int[] bytecode = assembler.assemble(source);
+        assertEquals(0, bytecode[3], "Deve gestire maiuscole/minuscole nelle label");
+    }
 }
