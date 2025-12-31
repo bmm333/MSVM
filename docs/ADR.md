@@ -28,6 +28,14 @@ Abbiamo Creato VmRunner:
    -Interface:start(),pause(),setFrequency(Hz)
    -Implementation: Gestisce un Worker Thread dedicato. Usa il pattern Monitor per gestire la pausa in modo efficente.Gestisce il Throttling temporale per simulare la velocita di clock.
    -Data: Usa VmStateSnapshot (record immutabile) per passare i dati alla UI, eliminando alla radice le Race Conditons.
+2.4 Assembler Strategy (Two-Pass Algorithm)
+   Per la traduzione del codice Assembly in Bytecode, abbiamo scartato l'approccio "One-Pass" (lettura sequenziale singola) a favore di un algoritmo Two-Pass.
+    -Context: Un assemblatore a passaggio singolo non puo risolvere i Forward References (salti in avanit),
+            ovvero un istruzione JUMP LOOP fa riferimento a un eticheta definita righe piu in basso.
+    -Decisione: L'assemblaggio avviene in due fasi distinte:
+                1- Symbol Resolution Pass 1: Scansione del Codice per mappare tutte le etichette Labe->indirizzo in una Symbol Table, senza generare bytecode.
+                2- Code Generation Pass 2: Traduzione effettiva delle istruzioni, utilizzando la Symbol Table per risolvere gli indirizzi dei salti.
+    -Why: Questo rende la scrittura dei programmi Assembly molto piu naturale per lutente eliminando la necessita di calcolare manualmente gli offset di memoria per i salti. !!wq
 3. Comments
 Nel codice i commenti seguono la regola: "Commenta il perche non che cosa", quindi spiegare l'astrazione e le decisioni di design non visibili.
 
@@ -35,4 +43,11 @@ Nel codice i commenti seguono la regola: "Commenta il perche non che cosa", quin
    -Manutenbilita: Possiamo cambiare limplementazione intera della CPU o del Threading senza rompere le istruzioni o la UI.
    -Safety: Il sistema e thread safe by design grazie agli Snapshot e all'incapsulamento del Runner.
 
-To Add : technical debt
+5. Debito Tecnico:
+    -Debito Tecnico (Limitazioni Accettate) Per rispettare le scadenze del progetto, abbiamo accettato consapevolmente le seguenti limitazioni:
+
+    -Parser Assembler: Attualmente le Label (es. LOOP:) devono essere definite su una riga dedicata, separata dall'istruzione. Il supporto per le label inline (es. LOOP: PUSH 10) non è ancora implementato.
+
+    -Loop Infiniti: La CPU non ha un meccanismo di sicurezza (watchdog) per interrompere loop infiniti nel codice Assembly. L'utente deve interrompere l'esecuzione manualmente tramite il pulsante Stop.
+
+    -Dimensione Memoria: La memoria ha una dimensione fissa definita all'avvio. Non è supportata l'allocazione dinamica o la paginazione.
