@@ -4,6 +4,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
 cache:
+  key: "$CI_COMMIT_REF_SLUG" # Cache separata per branch (più sicuro)
   paths:
     - .m2/repository/
 
@@ -13,27 +14,35 @@ stages:
 
 test_and_coverage:
   stage: test
+  tags:
+    - arben-pc # Tag per il runner locale (Cambia con il tuo Luca)
   script:
     - cd msvm-studio
     - mvn clean verify
-    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print "Total Coverage:", 100*covered/instructions, "%" }' target/site/jacoco/jacoco.csv
+    # Calcolo coverage. Ho aggiunto un controllo: se coverage < 80% esce con errore (exit 1)
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print "Total Coverage:", 100*covered/instructions, "%"; if (100*covered/instructions < 80) exit 1 }' target/site/jacoco/jacoco.csv
   coverage: '/Total Coverage: ([0-9]{1,3}\.[0-9]*)/'
   artifacts:
-      when: always
-      reports:
-        junit: msvm-studio/target/surefire-reports/TEST-*.xml
-        coverage_report:
-          coverage_format: jacoco
-          path: msvm-studio/target/site/jacoco/jacoco.xml
-      paths:
-        - msvm-studio/target/site/jacoco/
+    when: always
+    expire_in: 1 week  #non cera prima , meglio togliere in quanto lo spazio dei server e limitaTTISIMO
+    reports:
+      junit: msvm-studio/target/surefire-reports/TEST-*.xml
+      coverage_report:
+        coverage_format: jacoco
+        path: msvm-studio/target/site/jacoco/jacoco.xml
+    paths:
+      - msvm-studio/target/site/jacoco/
+
 package-app:
-    stage: build
-    script:
-      - cd msvm-studio
-      - mvn clean package -DskipTests #skip test in quanto gia fatti
-    artifacts:
-      paths:
-        - msvm-studio/target/*.jar
-    needs:
-        - job: test_and_coverage
+  stage: build
+  tags:
+    - arben-pc
+  script:
+    - cd msvm-studio
+    - mvn clean package -DskipTests
+  artifacts:
+    expire_in: 1 week # Stessa cosa , tanto il jar lo possiamo rigenerare
+    paths:
+      - msvm-studio/target/*.jar
+  needs:
+    - job: test_and_coverage
