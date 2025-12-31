@@ -20,4 +20,10 @@ public class HomeController {
         System.out.println("Click su Apri File");
         // TODO: Aprire il FileChooser di JavaFX
     }
+
+    @FXML
+    public void handleLogin() {
+        System.out.println("Click su Profilo Utente!");
+        // TODO: Fare il Login/register della applicazione
+    }
 }
