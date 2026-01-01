@@ -2,6 +2,7 @@ package it.uniupo.msvm.core.runtime;
 
 
 import it.uniupo.msvm.core.cpu.Cpu;
+import it.uniupo.msvm.core.exceptions.VmException;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
 import it.uniupo.msvm.core.memory.OperandStack;
@@ -83,5 +84,70 @@ public class VmRunnerTest {
         assertNotNull(snap.stack());
         snap.memory()[0] = 99;
         assertNotEquals(99, memory.read(0), "Lo snapshot deve essere una copia difensiva!");
+    }
+    //Test per VmListner
+    @Test
+    void testListenerCallbacks() throws InterruptedException {
+        // Perparo un semaforo che aseptta 1 evento
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+
+        //si crea un listener "spia"
+        VmListener spyListener = new VmListener() {
+            @Override
+            public void onVmUpdate(VmStateSnapshot snapshot) {
+                assertNotNull(snapshot);
+                // Appena riceve l'evento, abbassa il semaforo
+                latch.countDown();
+            }
+            @Override
+            public void onVmError(String message) {
+                fail("Non mi aspettavo errori: " + message);
+            }
+        };
+
+        //registri la spia
+        runner.addListener(spyListener);
+
+        //Facciamo fare uno step manuale
+        memory.write(0, Opcode.PUSH.getCode());
+        runner.step();
+
+        // Verifica: Aspettiamo max 1 secondo che il listener venga chiamato.
+        // Se latch arriva a 0, ritorna true. Se scade il tempo, ritorna false.
+        boolean eventReceived = latch.await(1, TimeUnit.SECONDS);
+
+        assertTrue(eventReceived, "Il metodo onVmUpdate non e mai stato chiamato!");
+    }
+    @Test
+    void testErrorPropagation() throws InterruptedException {
+        //Regostro istruzione che dovrebbe far crashare la VM
+        Opcode badOpcode=Opcode.POP;
+        cpu.registerInstruction(badOpcode,ctx->{throw new VmException("0...1...2...3 Cpu exploded");});
+        //scriviamo istr in mem
+        memory.write(0,badOpcode.getCode());
+        //spia per lerrore
+        java.util.concurrent.CountDownLatch errorLatch = new java.util.concurrent.CountDownLatch(1);
+        final String[] receivedError = {null}; //Wrapper per salvare il messaggio
+
+        runner.addListener(new VmListener() {
+            @Override
+            public void onVmUpdate(VmStateSnapshot snapshot) {}
+
+            @Override
+            public void onVmError(String message) {
+                receivedError[0]=message; //catturo il messaggio
+                errorLatch.countDown(); //segnalare che lérrore e arrivato
+            }
+        });
+        //Facciamo un step per causare il crash
+        runner.step();
+        //verifico
+        boolean crashReported=errorLatch.await(1, TimeUnit.SECONDS);
+        assertTrue(crashReported,"Il runner deve notificare l'errore tramite onVmError");
+        assertNotNull(receivedError[0]);
+        assertTrue(receivedError[0].contains("exploded"), "Il messaggio d'errore deve contenere la causa originale");
+
+        //per sicurezza controlliamo che il runner si e fermato
+        assertFalse(runner.isRunning(), "Dopo un crash il runner deve fermarsi");
     }
 }

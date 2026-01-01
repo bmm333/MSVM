@@ -15,13 +15,11 @@ import java.util.Map;
  * @author Arben Mema
  */
 public class Assembler {
-
     /**
      * Tabella dei simboli per memorizzare le associazioni tra Etichette (Label) e Indirizzi di memoria.
      * La chiave è il nome della label (es. "LOOP"), il valore è l'indice nell'array del bytecode.
      */
     private final Map<String, Integer> symbolTable = new HashMap<>();
-
     /**
      * Trasforma un programma Assembly in un array di int.
      * Esegue l'assemblaggio in due fasi:
