@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static it.uniupo.msvm.core.instructions.Opcode.PUSH;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CpuTest {
@@ -30,8 +31,8 @@ public class CpuTest {
     @Test
     @DisplayName("Fetch: IP should increment after reading opcode")
     void testFetchIncrement() {
-        cpu.registerInstruction(Opcode.PUSH, ctx -> { /* do nothing */ });
-        memory.write(0, Opcode.PUSH.getCode());
+        cpu.registerInstruction(PUSH, ctx -> { /* do nothing */ });
+        memory.write(0, PUSH.getCode());
 
         cpu.step();
 
@@ -58,12 +59,12 @@ public class CpuTest {
     @DisplayName("Context: FetchNextByte should read argument and increment IP")
     void testFetchNextByte() {
         // Simuliamo una vera PUSH: Legge opcode, poi legge il valore successivo
-        cpu.registerInstruction(Opcode.PUSH, ctx -> {
+        cpu.registerInstruction(PUSH, ctx -> {
             int arg = ctx.fetchNextByte(); // <--- Questo metodo non era testato!
             ctx.push(arg);
         });
 
-        memory.write(0, Opcode.PUSH.getCode()); // Opcode
+        memory.write(0, PUSH.getCode()); // Opcode
         memory.write(1, 42);                    // Argomento (valore)
 
         cpu.step();
@@ -97,9 +98,9 @@ public class CpuTest {
     @Test
     @DisplayName("Robustness: FetchNextByte out of bounds")
     void testFetchNextByteOutOfBounds() {
-        cpu.registerInstruction(Opcode.PUSH, ctx -> ctx.fetchNextByte());
+        cpu.registerInstruction(PUSH, ctx -> ctx.fetchNextByte());
 
-        memory.write(MEM_SIZE - 1, Opcode.PUSH.getCode());
+        memory.write(MEM_SIZE - 1, PUSH.getCode());
         cpu.setIp(MEM_SIZE - 1);
 
         MemoryAccessException ex = assertThrows(MemoryAccessException.class, () -> cpu.step());
@@ -109,10 +110,10 @@ public class CpuTest {
     @Test
     @DisplayName("Run Loop: Should stop when Halted flag is set")
     void testRunLoop() {
-        cpu.registerInstruction(Opcode.PUSH, ctx -> {});
+        cpu.registerInstruction(PUSH, ctx -> {});
         cpu.registerInstruction(Opcode.HALT, ctx -> ctx.halt());
-        memory.write(0, Opcode.PUSH.getCode());
-        memory.write(1, Opcode.PUSH.getCode());
+        memory.write(0, PUSH.getCode());
+        memory.write(1, PUSH.getCode());
         memory.write(2, Opcode.HALT.getCode());
 
         cpu.run();
