@@ -37,9 +37,11 @@
                 <VBox alignment="CENTER" minWidth="300" spacing="20" styleClass="panel-box">
                     <padding><Insets bottom="30" left="20" right="20" top="30" /></padding>
 
-                    <Button maxWidth="Infinity" onAction="#handleCreaFile" styleClass="menu-button" text="Crea File 📄" />
-                    <Button maxWidth="Infinity" onAction="#handleApriFile" styleClass="menu-button" text="Apri File 📂" />
-                    <Button maxWidth="Infinity" styleClass="menu-button" text="Esplora Community ☁️" />
+                    <Button fx:id="btnCreaFile" text="Crea File 📄" styleClass="menu-button" maxWidth="Infinity" onAction="#handleCreaFile"/>
+
+                    <Button fx:id="btnApriFile" text="Apri File 📂" styleClass="menu-button" maxWidth="Infinity" onAction="#handleApriFile"/>
+
+                    <Button fx:id="btnEsplora" text="Esplora Community ☁️" styleClass="menu-button" maxWidth="Infinity" onAction="#handleEsplora"/>
                 </VBox>
 
                 <VBox styleClass="feed-box" HBox.hgrow="ALWAYS">

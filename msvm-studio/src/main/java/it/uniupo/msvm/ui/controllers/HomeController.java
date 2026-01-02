@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 public class HomeController {
 
     @FXML
-    public void inizialize(){
+    public void initialize(){
         System.out.println("Homepage Initialization");
     }
 
@@ -19,6 +19,10 @@ public class HomeController {
     public void handleApriFile() {
         System.out.println("Click su Apri File");
         // TODO: Aprire il FileChooser di JavaFX
+    }
+
+    public void handleEsplora(){
+        System.out.println("Click su Esplora");
     }
 
     @FXML
