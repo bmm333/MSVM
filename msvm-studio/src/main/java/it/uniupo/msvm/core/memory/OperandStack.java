@@ -15,12 +15,26 @@ public class OperandStack {
         if (internalStack.isEmpty()) throw new RuntimeException("Stack Underflow");
         return internalStack.pop();
     }
+
     public int peek() {
+        if (internalStack.isEmpty()) throw new RuntimeException("Stack Empty");
         return internalStack.peek();
     }
 
+    /**
+     * Ritorna una copia della lista per debug o UI.
+     * È importante che sia una copia per la thread-safety dello Snapshot.
+     */
     public List<Integer> getStackDump() {
-        // Crea una nuova lista copiando gli elementi attuali dello stack
         return new ArrayList<>(internalStack);
+    }
+
+    // Questo metodo serve alla CPU per lo snapshot
+    public List<Integer> getElements() {
+        return new ArrayList<>(internalStack);
+    }
+
+    public void clear() {
+        internalStack.clear();
     }
 }
