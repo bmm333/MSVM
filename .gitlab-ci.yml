@@ -17,6 +17,7 @@ test_and_coverage:
   tags:
     - Luca_Runner # Tag per il runner locale (Cambia con il tuo Luca)
   script:
+    - apt-get update && apt-get install -y libgtk-3-0 libgl1-mesa-glx xvfb libxtst6 libasound2 libx11-6 libx11-xcb1 libxi6 libxrender1
     - cd msvm-studio
     - mvn clean verify
     # Calcolo coverage. Ho aggiunto un controllo: se coverage < 80% esce con errore (exit 1)
