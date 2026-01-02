@@ -42,7 +42,6 @@ package-app:
   stage: build
   tags:
     - Luca_Runner
-    - arben-main-pc
   script:
     - cd msvm-studio
     - mvn clean package -DskipTests # skip test in quanto gia fatti
