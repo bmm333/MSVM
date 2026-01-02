@@ -15,7 +15,7 @@ stages:
 test_and_coverage:
   stage: test
   tags:
-    - arben-main-pc # Tag per il runner locale (Cambia con il tuo Luca)
+    - Luca_Runner # Tag per il runner locale (Cambia con il tuo Luca)
   script:
     - cd msvm-studio
     - mvn clean verify
