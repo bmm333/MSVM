@@ -156,7 +156,6 @@ public class Cpu implements ExecutionContext {
     }
 
     public int getLastWrittenAddress() {
-        // TODO: Per ora ritorniamo 0 o gestiamo la logica 'lastChanged' nella memoria in futuro
         return 0;
     }
     /**

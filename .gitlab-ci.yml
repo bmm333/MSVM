@@ -5,6 +5,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Djava.awt.headless=false -Dprism.order=sw -Dprism.text=t2k"
 
 cache:
+  key: "$CI_COMMIT_REF_SLUG" # Cache separata per branch (più sicuro)
   paths:
     - .m2/repository/
 
@@ -14,6 +15,8 @@ stages:
 
 test_and_coverage:
   stage: test
+  tags:
+    - arben-main-pc # Tag per il runner locale (Cambia con il tuo Luca)
   script:
     - apt-get update && apt-get install -y libgtk-3-0 libgl1-mesa-glx xvfb libxtst6 libasound2 libx11-6 libx11-xcb1 libxi6 libxrender1
 
