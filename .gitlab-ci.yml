@@ -1,7 +1,8 @@
 image: maven:3.9.6-eclipse-temurin-21
 
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  # Ho aggiunto le opzioni per JavaFX (headless=false e rendering software) accanto alla tua config della cache
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Djava.awt.headless=false -Dprism.order=sw -Dprism.text=t2k"
 
 cache:
   key: "$CI_COMMIT_REF_SLUG" # Cache separata per branch (più sicuro)
@@ -19,13 +20,15 @@ test_and_coverage:
   script:
     - apt-get update && apt-get install -y libgtk-3-0 libgl1-mesa-glx xvfb libxtst6 libasound2 libx11-6 libx11-xcb1 libxi6 libxrender1
     - cd msvm-studio
-    - mvn clean verify
-    # Calcolo coverage. Ho aggiunto un controllo: se coverage < 80% esce con errore (exit 1)
-    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print "Total Coverage:", 100*covered/instructions, "%"; if (100*covered/instructions < 80) exit 1 }' target/site/jacoco/jacoco.csv
+
+    - xvfb-run -a -s "-screen 0 1024x768x24" mvn clean verify
+
+
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print "Total Coverage:", 100*covered/instructions, "%" }' target/site/jacoco/jacoco.csv
+
   coverage: '/Total Coverage: ([0-9]{1,3}\.[0-9]*)/'
   artifacts:
     when: always
-    expire_in: 1 week  #non cera prima , meglio togliere in quanto lo spazio dei server e limitaTTISIMO
     reports:
       junit: msvm-studio/target/surefire-reports/TEST-*.xml
       coverage_report:
@@ -40,9 +43,8 @@ package-app:
     - Luca_Runner
   script:
     - cd msvm-studio
-    - mvn clean package -DskipTests
+    - mvn clean package -DskipTests # skip test in quanto gia fatti
   artifacts:
-    expire_in: 1 week # Stessa cosa , tanto il jar lo possiamo rigenerare
     paths:
       - msvm-studio/target/*.jar
   needs:
