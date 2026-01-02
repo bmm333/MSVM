@@ -2,6 +2,9 @@ package  it.uniupo.msvm.core.runtime;
 
 import it.uniupo.msvm.core.cpu.Cpu;
 import it.uniupo.msvm.core.exceptions.VmException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class VmRunner implements Clock,Runnable {
     private final Cpu cpu;
     private Thread workerThread;
@@ -9,7 +12,8 @@ public class VmRunner implements Clock,Runnable {
     private volatile boolean running = false;
     private volatile boolean paused = true;
     private volatile int delayMs = 0;
-
+    //Lista degli osservatori (UI)
+    private final List<VmListener> listeners = new ArrayList<>();
     //oggetto lock dedicato per gestire la pausa senza bloccare lintera istanza
     private final Object pauseLock = new Object();
 
@@ -22,6 +26,42 @@ public class VmRunner implements Clock,Runnable {
         synchronized (pauseLock) {
             paused = false;
             pauseLock.notifyAll(); // Sveglia il thread che dorme nel wait()
+        }
+    }
+    //gestione listner
+    public void addListener(VmListener listener)
+    {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+    public void removeListener(VmListener listener)
+    {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+    //Helper per notificare tutti
+    private void fireUpdate()
+    {
+        //prendere lo snapshot in modo  thread safe (usando getSnapshot)
+        VmStateSnapshot snap=getSnapshot();
+        synchronized (listeners)
+        {
+            for(VmListener l:listeners)
+            {
+                l.onVmUpdate(snap);
+            }
+        }
+    }
+    private void fireError(String msg)
+    {
+        synchronized (listeners)
+        {
+            for(VmListener l:listeners)
+            {
+                l.onVmError(msg);
+            }
         }
     }
     @Override
@@ -55,6 +95,7 @@ public class VmRunner implements Clock,Runnable {
             //2. Check stato CPU
             if (cpu.isHalted()) {
                 stop();
+                fireUpdate();
                 break;
             }
             //3. Esecuzione step atomico
@@ -63,9 +104,12 @@ public class VmRunner implements Clock,Runnable {
                 synchronized (this) {
                     cpu.step();
                 }
+                fireUpdate();
             } catch (VmException e) {
                 System.err.println("CPU Error: " + e.getMessage());
                 //in futuro notifichero ui per il crash
+                //E arrivato quel giorno :D
+                fireError(e.getMessage());
                 stop();
                 break;
             }
@@ -104,8 +148,10 @@ public class VmRunner implements Clock,Runnable {
                     cpu.step();
                 }
             }
+            fireUpdate();
         } catch (VmException e) {
             System.err.println("Manual Step Error: " + e.getMessage());
+            fireError(e.getMessage());
         }
     }
     @Override

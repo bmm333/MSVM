@@ -7,6 +7,7 @@ import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
 import it.uniupo.msvm.core.memory.OperandStack;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -24,7 +25,8 @@ public class Cpu implements ExecutionContext {
     //Registri
     private int ip=0; //Instruction Pointer
     private boolean isHalted=false;
-
+    //Stato per UI (Snapshot)
+    private int lastWrittenAddress=-1; //-1 indica nessuna scrittura recente
     //Strategy Map per decodificare le istruzioni.
     private final Map<Opcode, Instruction>instructionSet=new HashMap<>();
 
@@ -67,6 +69,10 @@ public class Cpu implements ExecutionContext {
     public void step() {
         if (isHalted) return;
 
+        //resta il tracking della scrittura all inizio di ogni step
+        //se questa istr non scrive in memoria la ui non deve evidenzionare nulla.
+        this.lastWrittenAddress=-1;
+
         // 1. FETCH
         if (ip < 0 || ip >= memory.sizeMemory()) {
             throw new MemoryAccessException("Segmentation Fault: IP out of bounds",ip, MemoryAccessException.AccessType.READ);
@@ -90,6 +96,17 @@ public class Cpu implements ExecutionContext {
         // 3. EXECUTE
         // Passiamo 'this' perché Cpu implementa ExecutionContext
         instruction.execute(this);
+    }
+    /**
+     * Resetta lo stato della CPU utile per il tasto Stop/Reset
+     * */
+    public void reset()
+    {
+        this.ip=0;
+        this.isHalted=false;
+        this.lastWrittenAddress=-1;
+        this.stack.clear(); //aggiungo anche il metodo
+        // Nota: La memoria di solito non si resetta qui, ma la si sovrascrive caricando un nuovo programma.
     }
 
     // --- IMPLEMENTAZIONE EXECUTION CONTEXT ---
@@ -118,6 +135,7 @@ public class Cpu implements ExecutionContext {
     @Override
     public void writeMemory(int address, int value) {
         memory.write(address, value);
+        this.lastWrittenAddress=address;
     }
 
     @Override
@@ -147,17 +165,6 @@ public class Cpu implements ExecutionContext {
         }
         this.ip = address;
     }
-    public int[] getMemoryCopy() {
-        return memory.getMemoryDump();
-    }
-
-    public java.util.List<Integer> getStackCopy() {
-        return stack.getStackDump();
-    }
-
-    public int getLastWrittenAddress() {
-        return 0;
-    }
     /**
      * Restituisce lo stato di arresto della cpu
      * Fondamentale per il loop del VmRunner e per i test
@@ -165,4 +172,19 @@ public class Cpu implements ExecutionContext {
     public boolean isHalted() {
         return isHalted;
     }
+
+    // --Metodi Per Snapshot & UI
+    public int[] getMemoryCopy()
+    {
+        return memory.getMemoryDump();
+    }
+    public List<Integer> getStackCopy()
+    {
+        return stack.getElements();
+    }
+    public int getLastWrittenAddress(){
+        return lastWrittenAddress;
+    }
+
+
 }
