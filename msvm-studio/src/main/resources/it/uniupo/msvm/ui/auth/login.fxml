@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="20.0" styleClass="main-bg" stylesheets="@login.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.uniupo.msvm.ui.controllers.LoginController">
+
+    <VBox alignment="CENTER" maxWidth="-Infinity" prefWidth="320.0" spacing="15.0" styleClass="login-card">
+        <padding>
+            <Insets bottom="30.0" top="30.0" />
+        </padding>
+
+        <Label styleClass="title-label" text="Benvenuto" />
+        <Label styleClass="subtitle-label" text="Accedi alla Community" />
+
+        <TextField fx:id="txtUsername" promptText="Username" styleClass="input-field">
+            <VBox.margin>
+                <Insets left="25.0" right="25.0" top="10.0" />
+            </VBox.margin>
+        </TextField>
+
+        <PasswordField fx:id="txtPassword" promptText="Password" styleClass="input-field">
+            <VBox.margin>
+                <Insets left="25.0" right="25.0" />
+            </VBox.margin>
+        </PasswordField>
+
+        <Label fx:id="lblErrore" textFill="RED" visible="false" />
+
+        <Button onAction="#handleLogin" prefWidth="270.0" styleClass="login-btn" text="ACCEDI">
+            <VBox.margin>
+                <Insets top="10.0" />
+            </VBox.margin>
+        </Button>
+
+        <HBox alignment="CENTER" spacing="5.0">
+            <Label text="Non sei iscritto?" textFill="#777777" />
+            <Button onAction="#handleRegistrazione" styleClass="link-btn" text="Registrati ora" />
+        </HBox>
+
+    </VBox>
+</VBox>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane styleClass="main-background" stylesheets="@home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uniupo.msvm.ui.controllers.HomeController">
+
+    <padding>
+        <Insets bottom="30" left="30" right="30" top="30" />
+    </padding>
+
+    <center>
+        <VBox spacing="25">
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <VBox alignment="CENTER_LEFT" styleClass="header-welcome-box" HBox.hgrow="ALWAYS">
+                    <Label styleClass="header-text" text="Benvenuto in MSVM Community" />
+                    <Label opacity="0.8" text="Gestisci i tuoi progetti ed esplora le risorse." textFill="#2e7d32" />
+                </VBox>
+
+                <Button onAction="#handleLogin" styleClass="profile-button">
+                    <graphic>
+                        <HBox alignment="CENTER" spacing="10">
+                            <StackPane>
+                                <Circle fill="#eeeeee" radius="20" />
+                                <Label style="-fx-font-size: 20px;" text="👤" />
+                            </StackPane>
+
+                            <VBox alignment="CENTER_LEFT">
+                                <Label styleClass="user-name-label" text="Guest User" />
+                                <Label style="-fx-font-size: 10px; -fx-text-fill: #999;" text="Accedi ora" />
+                            </VBox>
+                        </HBox>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <HBox spacing="25" VBox.vgrow="ALWAYS">
+
+                <VBox minWidth="280" spacing="15" styleClass="panel-box">
+                    <Label styleClass="section-title" text="Azioni Rapide" />
+
+                    <Button fx:id="btnCreaFile" maxWidth="Infinity" onAction="#handleCreaFile" styleClass="menu-button" text="📄  Nuovo File MSVM" />
+
+                    <Button fx:id="btnApriFile" maxWidth="Infinity" onAction="#handleApriFile" styleClass="menu-button" text="📂  Apri Progetto..." />
+
+                    <Button fx:id="btnEsplora" maxWidth="Infinity" onAction="#handleEsplora" styleClass="menu-button" text="☁️  Esplora Community" />
+                </VBox>
+
+                <VBox styleClass="feed-box" HBox.hgrow="ALWAYS">
+                    <VBox styleClass="feed-header">
+                        <Label alignment="CENTER" styleClass="feed-title" text="FEED RECENTI" />
+                    </VBox>
+                    <VBox spacing="10" style="-fx-padding: 20;">
+                        <Label text="Nessuna novità al momento..." textFill="#999999" />
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="10">
+                <Label styleClass="section-title" text="File Recenti" />
+
+                <Button alignment="CENTER_LEFT" maxWidth="Infinity" styleClass="recent-file-item" text="Esercizio_Somma.msvm  —  Modificato oggi alle 10:30" />
+
+                <Button alignment="CENTER_LEFT" maxWidth="Infinity" styleClass="recent-file-item" text="Test_Macro_Square.msvm  —  Modificato ieri alle 18:00" />
+
+                <Button alignment="CENTER_LEFT" maxWidth="Infinity" styleClass="recent-file-item" text="Esempio_Loop.msvm  —  20 Dic 2025" />
+            </VBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>
