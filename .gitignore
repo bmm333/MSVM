@@ -1,2 +1,5 @@
 .idea
 .env
+target
+.gitlab-ci.yml
+pom.xml
