@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane styleClass="main-background" stylesheets="@home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uniupo.msvm.ui.controllers.HomeController">
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <center>
+        <VBox spacing="30">
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <StackPane styleClass="header-welcome-box" HBox.hgrow="ALWAYS">
+                    <Label styleClass="header-text" text="Benvenuto in MSVM Community" />
+                </StackPane>
+
+                <Button styleClass="profile-button" onAction="#handleLogin">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="5">
+                            <StackPane>
+                                <Circle radius="25" styleClass="user-icon-bg" fill="TRANSPARENT"/>
+                                <Label text="👤" style="-fx-font-size: 30px; -fx-text-fill: #333;"/>
+                            </StackPane>
+                            <Label text="Guest" styleClass="text-light"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <HBox spacing="30" VBox.vgrow="ALWAYS">
+
+                <VBox alignment="CENTER" minWidth="300" spacing="20" styleClass="panel-box">
+                    <padding><Insets bottom="30" left="20" right="20" top="30" /></padding>
+
+                    <Button fx:id="btnCreaFile" text="Crea File 📄" styleClass="menu-button" maxWidth="Infinity" onAction="#handleCreaFile"/>
+
+                    <Button fx:id="btnApriFile" text="Apri File 📂" styleClass="menu-button" maxWidth="Infinity" onAction="#handleApriFile"/>
+
+                    <Button fx:id="btnEsplora" text="Esplora Community ☁️" styleClass="menu-button" maxWidth="Infinity" onAction="#handleEsplora"/>
+                </VBox>
+
+                <VBox styleClass="feed-box" HBox.hgrow="ALWAYS">
+                    <StackPane styleClass="feed-header">
+                        <Label styleClass="feed-title" text="FEED" />
+                    </StackPane>
+                    <VBox style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="10">
+                <Label styleClass="section-title" text="Ultime Modifiche" />
+                 <Button alignment="CENTER_LEFT" maxWidth="Infinity" styleClass="recent-file-item" text="📄  Esercizio_Somma.msvm  -  Ultima modifica: Oggi 10:30" />
+                 <Button alignment="CENTER_LEFT" maxWidth="Infinity" styleClass="recent-file-item" text="📄  Test_Macro_Square.msvm  -  Ultima modifica: Ieri 18:00" />
+                 <Button alignment="CENTER_LEFT" maxWidth="Infinity" styleClass="recent-file-item" text="📄  Esempio_Loop.msvm  -  Ultima modifica: 20/12/2025" />
+
+                <VBox spacing="10" styleClass="recent-files-container" />
+            </VBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>
