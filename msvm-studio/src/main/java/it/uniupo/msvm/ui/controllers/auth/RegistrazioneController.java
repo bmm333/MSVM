@@ -15,12 +15,20 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * Controller responsabile della gestione dell'interfaccia di registrazione utente.
+ * Controller responsabile della gestione dell'autenticazione utente (Registrazione).
  * <p>
- * Questa classe gestisce l'interazione con la form di registrazione ({@code register.fxml}),
- * validando i dati inseriti dall'utente (nome, cognome, email, password) e gestendo
- * la navigazione di ritorno verso la schermata di login.
+ * Questa classe funge da punto di ingresso per l'applicazione, gestendo l'interazione
+ * con la vista di registrazione definita in {@code register.fxml}.
  * </p>
+ *
+ * <h3>Funzionalità e Metodi Principali:</h3>
+ * <ul>
+ * <li>{@link #handleRegistrazione(ActionEvent)} : Gestisce le credenziali e crea un nuovo utente.</li>
+ * <li>{@link #tornaALogin(ActionEvent)} : Gestisce la navigazione verso la schermata di login.</li>
+ * </ul>
+ *
+ * @author Luca Lupi
+ * @version 1.0
  */
 public class RegistrazioneController {
 
