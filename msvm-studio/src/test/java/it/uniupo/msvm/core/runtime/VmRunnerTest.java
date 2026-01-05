@@ -26,7 +26,7 @@ public class VmRunnerTest {
     void setup()
     {
         memory=new Memory(256);
-        OperandStack stack=new OperandStack(128);
+        OperandStack stack=new OperandStack();
         cpu = new Cpu(memory, stack);
         runner = new VmRunner(cpu);
         //registriamo istr "Stub" (finte) per testare il motore senza dipendeze esterne

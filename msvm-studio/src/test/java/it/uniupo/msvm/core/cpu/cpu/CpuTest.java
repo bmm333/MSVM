@@ -24,7 +24,7 @@ public class CpuTest {
     @BeforeEach
     void setUp() {
         memory = new Memory(MEM_SIZE);
-        stack = new OperandStack(128);
+        stack = new OperandStack();
         cpu = new Cpu(memory, stack);
     }
 

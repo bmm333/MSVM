@@ -19,7 +19,7 @@ public class InstructionTestBase {
     @BeforeEach
     void setUp(){
         memory=new Memory(256);
-        stack=new OperandStack(128);
+        stack=new OperandStack();
         cpu=new Cpu(memory,stack);
 
         ctx=cpu;

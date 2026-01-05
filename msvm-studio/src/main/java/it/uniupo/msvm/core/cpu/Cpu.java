@@ -6,7 +6,6 @@ import it.uniupo.msvm.core.instructions.Instruction;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
 import it.uniupo.msvm.core.memory.OperandStack;
-import it.uniupo.msvm.core.runtime.VmBackend;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.HashMap;
  * </p>
  * */
 
-public class Cpu implements ExecutionContext, VmBackend {
+public class Cpu implements ExecutionContext {
     private final Memory memory;
     private final OperandStack stack;
     //Registri
@@ -157,22 +156,6 @@ public class Cpu implements ExecutionContext, VmBackend {
     @Override
     public int getIp() {
         return ip;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public List<Integer> getStackSnapshot() {
-        return stack.getElements();
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public int[] getMemorySnapshot() {
-        return memory.getMemoryDump();
     }
 
     @Override

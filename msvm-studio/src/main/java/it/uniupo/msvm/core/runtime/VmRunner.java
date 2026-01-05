@@ -1,20 +1,12 @@
 package  it.uniupo.msvm.core.runtime;
 
+import it.uniupo.msvm.core.cpu.Cpu;
 import it.uniupo.msvm.core.exceptions.VmException;
 import java.util.ArrayList;
 import java.util.List;
-/**
- * Motore di esecuzione della VM.
- * <p>
- * Gestisce il ciclo di vita del thread di esecuzione, la sincronizzazione
- * e la notifica degli eventi.
- * </p>
- * Refactoring 2.0: Improved Concurrency (Private Lock) & Error handling (No leaking exceptions).
- *
- * @author Arben Mema
- */
+
 public class VmRunner implements Clock,Runnable {
-    private final VmBackend backend;
+    private final Cpu cpu;
     private Thread workerThread;
     //Flags volatili per garantire la visbilita tra Thread diversi (UI vs Runner)
     private volatile boolean running = false;
@@ -23,14 +15,11 @@ public class VmRunner implements Clock,Runnable {
     //Lista degli osservatori (UI)
     private final List<VmListener> listeners = new ArrayList<>();
     //oggetto lock dedicato per gestire la pausa senza bloccare lintera istanza
-    //Refactoring : Encapsulated Concurrency
     private final Object pauseLock = new Object();
-    private final Object backendLock = new Object();
-    private final Object listenerLock = new Object();
 
-    public VmRunner(VmBackend backend)
+    public VmRunner(Cpu cpu)
     {
-        this.backend = backend;
+        this.cpu = cpu;
     }
     // Metodo helper privato per la ripresa
     private void resume() {
@@ -40,40 +29,39 @@ public class VmRunner implements Clock,Runnable {
         }
     }
     //gestione listner
-    public void addListener(VmListener listener) {
-        synchronized (listenerLock) {
+    public void addListener(VmListener listener)
+    {
+        synchronized (listeners) {
             listeners.add(listener);
         }
     }
-
-    public void removeListener(VmListener listener) {
-        synchronized (listenerLock) {
+    public void removeListener(VmListener listener)
+    {
+        synchronized (listeners) {
             listeners.remove(listener);
         }
     }
     //Helper per notificare tutti
-    private void fireUpdate() {
-        VmStateSnapshot snap = getSnapshot(); // Thread-safe call
-
-        // Copia difensiva della lista listener per iterare fuori dal lock
-        // Evita deadlock se un listener richiama metodi del runner
-        List<VmListener> listenersCopy;
-        synchronized (listenerLock) {
-            listenersCopy = new ArrayList<>(listeners);
-        }
-
-        for (VmListener l : listenersCopy) {
-            l.onVmUpdate(snap);
+    private void fireUpdate()
+    {
+        //prendere lo snapshot in modo  thread safe (usando getSnapshot)
+        VmStateSnapshot snap=getSnapshot();
+        synchronized (listeners)
+        {
+            for(VmListener l:listeners)
+            {
+                l.onVmUpdate(snap);
+            }
         }
     }
-
-    private void fireError(String msg) {
-        List<VmListener> listenersCopy;
-        synchronized (listenerLock) {
-            listenersCopy = new ArrayList<>(listeners);
-        }
-        for (VmListener l : listenersCopy) {
-            l.onVmError(msg);
+    private void fireError(String msg)
+    {
+        synchronized (listeners)
+        {
+            for(VmListener l:listeners)
+            {
+                l.onVmError(msg);
+            }
         }
     }
     @Override
@@ -91,45 +79,41 @@ public class VmRunner implements Clock,Runnable {
         }
     }
     @Override
-    public void run() {
+    public void run () {
         while (running) {
-            //Gestione Pausa
+            //1. Gestione Pausa (pattern wait/notify)
             synchronized (pauseLock) {
                 while (paused && running) {
                     try {
-                        pauseLock.wait();
+                        pauseLock.wait(); //rilascia la cpu e va in sleep
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
                     }
                 }
             }
-
-            //Controllo Halt
-            // Accesso safe allo stato della CPU
-            boolean halted;
-            synchronized (backendLock) {
-                halted = backend.isHalted();
-            }
-
-            if (halted) {
+            //2. Check stato CPU
+            if (cpu.isHalted()) {
                 stop();
-                fireUpdate(); // Ultimo update per mostrare lo stato halt
+                fireUpdate();
                 break;
             }
-
-            //Step Atomico
+            //3. Esecuzione step atomico
             try {
-                executeAtomicStep();
+                //sync su this per vitare che un snapshot venga fatto a meta scrittura
+                synchronized (this) {
+                    cpu.step();
+                }
+                fireUpdate();
             } catch (VmException e) {
-                // Gestione graceful del crash
-                System.err.println("Runtime Crash: " + e.getMessage());
+                System.err.println("CPU Error: " + e.getMessage());
+                //in futuro notifichero ui per il crash
+                //E arrivato quel giorno :D
                 fireError(e.getMessage());
                 stop();
                 break;
             }
-
-            //Throttling
+            //4 Throttling(frequenza)
             if (delayMs > 0) {
                 try {
                     Thread.sleep(delayMs);
@@ -154,27 +138,22 @@ public class VmRunner implements Clock,Runnable {
     }
     @Override
     public void step() {
-        // Design Decision: Se la VM sta correndo, ignoriamo lo step manuale.
-        // Non lanciamo eccezioni alla UI (Information Hiding).
+        // Step manuale: consentito solo se siamo in pausa
         if (!paused) {
-            fireError("Warning: Cannot manual step while VM is running.");
-            return;
+            throw new IllegalStateException("Cannot manual step while running");
         }
-
         try {
-            boolean halted;
-            synchronized (backendLock) {
-                halted = backend.isHalted();
+            synchronized (this) {
+                if (!cpu.isHalted()) {
+                    cpu.step();
+                }
             }
-
-            if (!halted) {
-                executeAtomicStep();
-            }
+            fireUpdate();
         } catch (VmException e) {
+            System.err.println("Manual Step Error: " + e.getMessage());
             fireError(e.getMessage());
         }
     }
-
     @Override
     public boolean isRunning() {
         return running && !paused;
@@ -188,25 +167,18 @@ public class VmRunner implements Clock,Runnable {
             this.delayMs = 1000 / hz; // Es. 10Hz -> 100ms
         }
     }
-    private void executeAtomicStep() {
-        synchronized (backendLock) {
-            backend.step();
-        }
-        fireUpdate();
-    }
+
     /**
      * Genera un'istantanea thread-safe dello stato attuale.
      */
     public synchronized VmStateSnapshot getSnapshot() {
-        synchronized (backendLock) {
-            return new VmStateSnapshot(
-                    backend.getIp(),
-                    backend.isHalted(),
-                    backend.getStackSnapshot(),
-                    backend.getMemorySnapshot(),
-                    backend.getLastWrittenAddress()
-            );
-        }
+        return new VmStateSnapshot(
+                cpu.getIp(),
+                cpu.isHalted(),
+                cpu.getStackCopy(),
+                cpu.getMemoryCopy(),
+                cpu.getLastWrittenAddress()
+        );
     }
 }
 
