@@ -50,7 +50,7 @@ class HomeControllerTest{
      */
     @Start
     private void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uniupo/msvm/ui/home.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uniupo/msvm/ui/homepage/home.fxml"));
         Scene scene = new Scene(loader.load());
         stage.setScene(scene);
         stage.show();

@@ -1,0 +1,131 @@
+/* --- MODERN THEME (Material Inspired) --- */
+
+/* Sfondo generale: Bianco sporco per far risaltare le card */
+.main-background {
+    -fx-background-color: #f4f6f8;
+}
+
+/* --- 1. HEADER (La Card di Benvenuto) --- */
+.header-welcome-box {
+    /* Gradiente sottile invece di colore piatto */
+    -fx-background-color: linear-gradient(to right, #e8f5e9, #c8e6c9);
+    -fx-background-radius: 15;
+    /* Ombra leggera invece del bordo nero */
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.2), 10, 0, 0, 5);
+    -fx-padding: 25;
+}
+
+.header-text {
+    -fx-text-fill: #1b5e20;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800; /* Extra Bold */
+}
+
+/* --- 2. PROFILO UTENTE --- */
+.profile-button {
+    -fx-background-color: white;
+    -fx-background-radius: 30; /* Forma a pillola */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-cursor: hand;
+    -fx-padding: 5 15 5 5;
+}
+
+.profile-button:hover {
+    -fx-background-color: #ffffff;
+    -fx-translate-y: -2; /* Animazione: si alza leggermente */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 4);
+}
+
+/* Testo dentro il bottone profilo (se usi la vecchia label) */
+.text-light {
+    -fx-text-fill: #333333;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: bold;
+}
+
+/* Testo dentro il bottone profilo (se usi la nuova struttura) */
+.user-name-label {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* --- 3. BOTTONI MENU (Sinistra) --- */
+.panel-box {
+    -fx-background-color: transparent; /* Invisibile, serve solo per allineare */
+}
+
+.menu-button {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-text-fill: #37474f;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 5, 0, 0, 3);
+}
+
+.menu-button:hover {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #2e7d32; /* Testo verde all'hover */
+    -fx-translate-y: -2;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.2), 10, 0, 0, 5);
+}
+
+/* --- 4. FEED (Destra) --- */
+.feed-box {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.feed-header {
+    -fx-background-color: #fff3e0; /* Arancio pastello */
+    -fx-background-radius: 15 15 0 0;
+    -fx-padding: 15;
+    -fx-border-color: #ffe0b2;
+    -fx-border-width: 0 0 1 0;
+}
+
+.feed-title {
+    -fx-text-fill: #ef6c00;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1;
+}
+
+/* --- 5. LISTA FILE RECENTI (Footer) --- */
+.section-title {
+    -fx-text-fill: #546e7a;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 5;
+    -fx-text-transform: uppercase;
+}
+
+.recent-files-container {
+    -fx-background-color: transparent;
+}
+
+.recent-file-item {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-width: 0 0 0 4; /* Solo bordo sinistro colorato */
+    -fx-border-color: transparent;
+    -fx-text-fill: #455a64;
+    -fx-font-size: 14px;
+    -fx-padding: 12 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1);
+}
+
+.recent-file-item:hover {
+    -fx-background-color: #f1f8e9; /* Verde chiarissimo */
+    -fx-border-color: #43a047;     /* Linea verde appare a sinistra */
+    -fx-text-fill: #2e7d32;
+    -fx-translate-x: 5;            /* Spostamento a destra */
+}
