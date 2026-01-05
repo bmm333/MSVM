@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<BorderPane styleClass="main-background" stylesheets="@home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uniupo.msvm.ui.controllers.HomeController">
+<BorderPane styleClass="main-background" stylesheets="@home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uniupo.msvm.ui.controllers.homepage.HomeController">
 
     <padding>
         <Insets bottom="30" left="30" right="30" top="30" />

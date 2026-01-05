@@ -1,4 +1,4 @@
-package it.uniupo.msvm.ui.controllers;
+package it.uniupo.msvm.ui.controllers.homepage;
 
 import it.uniupo.msvm.App;
 import javafx.event.ActionEvent;
@@ -6,12 +6,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 
-import java.awt.*;
 import java.io.IOException;
 
 public class HomeController {
