@@ -1,11 +1,9 @@
-package it.uniupo.msvm.ui.homepage;
+package it.uniupo.msvm.ui.auth;
 
 import it.uniupo.msvm.App; // Assicurati di importare la tua Main App
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

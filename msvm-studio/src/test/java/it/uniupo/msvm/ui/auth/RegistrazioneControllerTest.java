@@ -1,4 +1,4 @@
-package it.uniupo.msvm.ui.homepage;
+package it.uniupo.msvm.ui.auth;
 
 import it.uniupo.msvm.ui.controllers.RegistrazioneController;
 import javafx.application.Platform;
@@ -11,8 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
