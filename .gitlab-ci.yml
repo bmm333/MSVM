@@ -16,7 +16,7 @@ stages:
 test_and_coverage:
   stage: test
   tags:
-    - arben-main-pc # Tag per il runner locale (Cambia con il tuo Luca)
+    - Luca_Runner # Tag per il runner locale (Cambia con il tuo Luca)
   script:
     - apt-get update && apt-get install -y libgtk-3-0 libgl1-mesa-glx xvfb libxtst6 libasound2 libx11-6 libx11-xcb1 libxi6 libxrender1
     - cd msvm-studio
@@ -40,7 +40,7 @@ test_and_coverage:
 package-app:
   stage: build
   tags:
-    - arben-main-pc
+    - Luca_Runner
   script:
     - cd msvm-studio
     - mvn clean package -DskipTests # skip test in quanto gia fatti
