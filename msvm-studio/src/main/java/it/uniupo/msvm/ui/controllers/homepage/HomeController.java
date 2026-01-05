@@ -6,10 +6,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
-
+import javafx.scene.Parent;
+import it.uniupo.msvm.ui.controllers.editor.EditorController;
+import java.nio.file.Files;
 import java.io.IOException;
 
 /**
@@ -33,7 +36,8 @@ import java.io.IOException;
  * </ul>
  *
  * @author Luca Lupi
- * @version 1.0
+ * @author Arben Mema (Parte di integrazione Editor)
+ * @version 1.1
  */
 public class HomeController {
 
@@ -61,7 +65,7 @@ public class HomeController {
     @FXML
     public void handleCreaFile(ActionEvent event){
         System.out.println("Click su Crea File");
-        //Todo: aspettare l'editor per fare il crea file
+        launchEditor(null,event);//null in quanto non ce niente da leggere
     }
 
     /**
@@ -95,13 +99,70 @@ public class HomeController {
 
         if(file != null){
             System.out.println("File Scelto: " + file.getAbsoluteFile());
-            // TODO: Aggiungere qui la logica di parsing o elaborazione del file
+            try{
+                /**
+                 * @author Arben Mema
+                 * */
+                FXMLLoader loader=new FXMLLoader(getClass().getResource("/it/uniupo/msvm/ui/editor/EditorWindow.fxml"));
+                Parent root=loader.load();
+                //Passo il contenuto del file al editor
+                EditorController controller=loader.getController();
+                String content = Files.readString(file.toPath());
+                controller.setCode(content);
+                //Cambio Scena(Switch)
+                Scene simulatorScene=new Scene(root,1200,800);
+                stage.setScene(simulatorScene);
+                stage.setTitle("MSVM Studio - Simulator [" + file.getName() + "]");
+                stage.centerOnScreen();
+                stage.show();
+                /**
+                 * fine modifica
+                 * @author Arben Mema*/
+            }catch (IOException e){
+                e.printStackTrace();
+                System.err.println("Error impossibile caricare il simulatore: " + e.getMessage());
+            }
         }
         else{
             System.out.println("Selezione annullata");
         }
     }
-
+    /**
+     * Metodo helper privato per caricare la scena del Editor
+     * Rispetta il principio DRY
+     * @param file il file da caricare (se null, apre editor vuoto/def)
+     * @param event  L'evento UI necessario per recuperare lo Stage corrente
+     * */
+    private void launchEditor(File file,ActionEvent event)
+    {
+        try{
+            FXMLLoader loader=new FXMLLoader(getClass().getResource("/it/uniupo/msvm/ui/editor/EditorWindow.fxml"));
+            Parent root=loader.load();
+            EditorController controller=loader.getController();
+            String windowTitle="MSVM Studio - Untitled";
+            if(file!=null)
+            {
+                //se apriamo un file leggiamo il contenuto
+                String content =Files.readString(file.toPath());
+                controller.setCode(content);
+                windowTitle="MSVM Studio - "+ file.getName();
+            }else{
+                //Nuovo file , template base
+                controller.setCode("; New Project\n;");
+            }
+            //Switch scena
+            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            Scene editorScene=new Scene(root,1200,800);
+            stage.setScene(editorScene);
+            stage.setTitle(windowTitle);
+            stage.centerOnScreen();
+            stage.show();
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+            showError("Errore Caricamento", "Impossibile avviare il simulatore.\n" + e.getMessage());
+        }
+    }
     /**
      * Gestisce la navigazione verso la sezione "Esplora".
      * <p>
@@ -139,5 +200,13 @@ public class HomeController {
         stage.setTitle("MSVM Studio");
         stage.setScene(scene);
         stage.show();
+    }
+    // Utility per mostrare errori grafici
+    private void showError(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Errore");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

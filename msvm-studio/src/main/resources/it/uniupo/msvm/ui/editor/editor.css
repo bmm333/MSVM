@@ -1,0 +1,182 @@
+.root-container {
+    -fx-background-color: #1c1c1e;
+}
+
+.toolbar-container {
+}
+
+.app-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+}
+
+.status-bar {
+    -fx-background-color: #2c2c2e;
+    -fx-background-radius: 8;
+    -fx-padding: 5 15;
+}
+
+.status-label {
+    -fx-text-fill: #8e8e93;
+    -fx-font-weight: bold;
+}
+
+.main-split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.transparent-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.memory-grid {
+    -fx-padding: 5;
+}
+
+.legend-box {
+    -fx-padding: 5 0 0 0;
+}
+
+.legend-label {
+    -fx-font-size: 10px;
+}
+
+.legend-code {
+    -fx-text-fill: #0a84ff;
+}
+
+.legend-data {
+    -fx-text-fill: #30d158;
+}
+
+.legend-empty {
+    -fx-text-fill: #48484a;
+}
+
+.inner-split-pane {
+    -fx-background-color: transparent;
+}
+
+.lifo-label {
+    -fx-text-fill: #48484a;
+    -fx-font-size: 9px;
+}
+
+.root-pane {
+    -fx-background-color: #1c1c1e;
+}
+
+.app-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+}
+
+.status-bar {
+    -fx-background-color: #2c2c2e;
+    -fx-background-radius: 8;
+    -fx-padding: 5 15;
+}
+
+.status-label {
+    -fx-text-fill: #8e8e93;
+    -fx-font-weight: bold;
+}
+
+.main-split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.memory-grid-pane {
+    -fx-padding: 5;
+}
+
+.legend-container {
+    -fx-padding: 5 0 0 0;
+}
+
+.legend-code {
+    -fx-text-fill: #0a84ff;
+    -fx-font-size: 10px;
+}
+
+.legend-data {
+    -fx-text-fill: #30d158;
+    -fx-font-size: 10px;
+}
+
+.legend-empty {
+    -fx-text-fill: #48484a;
+    -fx-font-size: 10px;
+}
+
+.inner-split {
+    -fx-background-color: transparent;
+}
+
+.root-pane {
+    -fx-background-color: #1c1c1e;
+}
+
+.app-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+}
+
+.status-bar {
+    -fx-background-color: #2c2c2e;
+    -fx-background-radius: 8;
+    -fx-padding: 5 15;
+}
+
+.status-label {
+    -fx-text-fill: #8e8e93;
+    -fx-font-weight: bold;
+}
+
+.main-split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.memory-grid-pane {
+    -fx-padding: 5;
+}
+
+.legend-container {
+    -fx-padding: 5 0 0 0;
+}
+
+.legend-code {
+    -fx-text-fill: #0a84ff;
+    -fx-font-size: 10px;
+}
+
+.legend-data {
+    -fx-text-fill: #30d158;
+    -fx-font-size: 10px;
+}
+
+.legend-empty {
+    -fx-text-fill: #48484a;
+    -fx-font-size: 10px;
+}
+
+.inner-split {
+    -fx-background-color: transparent;
+}
