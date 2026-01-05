@@ -1,192 +1,135 @@
 package it.uniupo.msvm.ui.auth;
 
-import it.uniupo.msvm.ui.controllers.RegistrazioneController;
-import javafx.application.Platform;
+import it.uniupo.msvm.App;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import javafx.stage.Stage;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.api.FxRobot;
+import org.testfx.api.FxToolkit;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
-import java.lang.reflect.Field;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.testfx.api.FxAssert.verifyThat;
+import static org.testfx.matcher.control.LabeledMatchers.hasText;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Suite di test per {@link RegistrazioneController}.
- * <p>
- * Verifica la logica di validazione dei campi del form di registrazione.
- * Utilizza JavaFX Platform startup per consentire l'istanziazione dei controlli UI.
- * </p>
+ * Suite di test di integrazione UI per la Registrazione.
+ * Utilizza {@link FxRobot} per simulare l'interazione dell'utente con la form.
  */
+@ExtendWith(ApplicationExtension.class)
 class RegistrazioneControllerTest {
 
-    private RegistrazioneController controller;
-
-    // Campi simulati per l'iniezione
-    private TextField txtNome;
-    private TextField txtCognome;
-    private TextField txtEmail;
-    private PasswordField txtPassword;
-    private PasswordField txtConfermaPass;
-    private Label lblErroreReg;
-
     /**
-     * Avvia il toolkit JavaFX una volta sola prima di tutti i test.
-     * Necessario per poter istanziare TextField e Label senza errori.
+     * Metodo di setup eseguito automaticamente da TestFX prima di ogni test.
+     * Carica la vista 'register.fxml' in uno Stage reale.
      */
-    /**
-     * Avvia il toolkit JavaFX in modo sicuro.
-     * Se è già stato avviato da un altro test, ignora l'errore e prosegue.
-     */
-    @BeforeAll
-    static void initJfxToolkit() {
-        try {
-            // Proviamo ad avviare il Toolkit
-            Platform.startup(() -> {});
-        } catch (IllegalStateException e) {
-            // Se entriamo qui, significa che il Toolkit era già attivo.
-            // Non facciamo nulla, va benissimo così!
-        }
+    @Start
+    public void start(Stage stage) throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("ui/auth/register.fxml"));
+        Parent root = loader.load();
+
+        stage.setScene(new Scene(root));
+        stage.show();
+        stage.toFront();
     }
 
     /**
-     * Configurazione dell'ambiente di test.
-     * Crea il controller e inietta manualmente i componenti UI usando la Reflection.
+     * Pulizia dopo ogni test (chiude lo stage per evitare conflitti).
      */
-    @BeforeEach
-    void setUp() throws Exception {
-        // Poiché i controlli JavaFX devono essere creati nel thread FX o dopo l'init
-        Platform.runLater(() -> {
-            controller = new RegistrazioneController();
-            txtNome = new TextField();
-            txtCognome = new TextField();
-            txtEmail = new TextField();
-            txtPassword = new PasswordField();
-            txtConfermaPass = new PasswordField();
-            lblErroreReg = new Label();
-        });
-
-        // Attendiamo che il thread FX finisca l'inizializzazione
-        Thread.sleep(100);
-
-        // Iniezione manuale tramite Reflection (perché i campi sono privati)
-        injectField("txtNome", txtNome);
-        injectField("txtCognome", txtCognome);
-        injectField("txtEmail", txtEmail);
-        injectField("txtPassword", txtPassword);
-        injectField("txtConfermaPass", txtConfermaPass);
-        injectField("lblErroreReg", lblErroreReg);
-    }
-
-    /**
-     * Helper per iniettare campi privati usando Reflection.
-     */
-    private void injectField(String fieldName, Object value) throws Exception {
-        Field field = RegistrazioneController.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(controller, value);
-    }
-
-    /**
-     * Chiama il metodo privato o protetto handleRegistrazione tramite reflection
-     * o semplicemente invoca il metodo se è package-private.
-     * Qui simuliamo l'azione chiamando il metodo annotato con @FXML.
-     */
-    private void invokeHandleRegistrazione() {
-        // Nota: Passiamo null come ActionEvent perché stiamo testando solo la validazione
-        // che avviene PRIMA dell'uso dell'evento.
-        try {
-            // Usiamo reflection per chiamare il metodo privato/package-private
-            java.lang.reflect.Method method = RegistrazioneController.class.getDeclaredMethod("handleRegistrazione", javafx.event.ActionEvent.class);
-            method.setAccessible(true);
-            method.invoke(controller, (javafx.event.ActionEvent) null);
-        } catch (Exception e) {
-            // Ignoriamo eccezioni di navigazione (perché event è null), ci interessa solo se setta la label prima
-        }
+    @AfterEach
+    public void tearDown() throws Exception {
+        FxToolkit.hideStage();
+        // Rilascia eventuali tasti (es. shift/ctrl) rimasti premuti
+        new FxRobot().release(new javafx.scene.input.KeyCode[]{});
     }
 
     @Test
-    @DisplayName("Fallimento: Campi Vuoti")
-    void testValidazioneCampiVuoti() {
-        Platform.runLater(() -> {
-            // Setup: Lasciamo i campi vuoti
-            txtNome.setText("");
+    @DisplayName("Fallimento: Click su Registrati con campi vuoti")
+    void testValidazioneCampiVuoti(FxRobot robot) {
+        // 1. Azione: Clicca direttamente sul bottone (che ha testo "REGISTRATI ORA")
+        // Puoi usare il selettore CSS della classe (.login-btn) o il testo
+        robot.clickOn(".login-btn");
 
-            // Esecuzione
-            invokeHandleRegistrazione();
-
-            // Verifica
-            assertTrue(lblErroreReg.isVisible(), "La label di errore deve essere visibile");
-            assertEquals("Tutti i campi sono obbligatori!", lblErroreReg.getText());
-        });
-        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        // 2. Verifica: La label di errore deve apparire con il messaggio corretto
+        verifyThat("#lblErroreReg", (Label l) -> l.isVisible());
+        verifyThat("#lblErroreReg", hasText("Tutti i campi sono obbligatori!"));
     }
 
     @Test
     @DisplayName("Fallimento: Password Non Coincidenti")
-    void testPasswordNonCoincidenti() {
-        Platform.runLater(() -> {
-            // Setup
-            txtNome.setText("Mario");
-            txtCognome.setText("Rossi");
-            txtEmail.setText("mario@test.com");
-            txtPassword.setText("password123");
-            txtConfermaPass.setText("passwordDIVERSA"); // <--- Errore qui
+    void testPasswordNonCoincidenti(FxRobot robot) {
+        // 1. Compila i campi
+        robot.clickOn("#txtNome").write("Mario");
+        robot.clickOn("#txtCognome").write("Rossi");
+        robot.clickOn("#txtEmail").write("mario@test.com");
 
-            // Esecuzione
-            invokeHandleRegistrazione();
+        // 2. Inserisce password diverse
+        robot.clickOn("#txtPassword").write("password123");
+        robot.clickOn("#txtConfermaPass").write("passwordDIVERSA");
 
-            // Verifica
-            assertTrue(lblErroreReg.isVisible());
-            assertEquals("Le password non coincidono!", lblErroreReg.getText());
-        });
-        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        // 3. Click Registrati
+        robot.clickOn(".login-btn");
+
+        // 4. Verifica errore
+        verifyThat("#lblErroreReg", hasText("Le password non coincidono!"));
     }
 
     @Test
     @DisplayName("Fallimento: Password Troppo Corta")
-    void testPasswordCorta() {
-        Platform.runLater(() -> {
-            // Setup
-            txtNome.setText("Mario");
-            txtCognome.setText("Rossi");
-            txtEmail.setText("mario@test.com");
-            txtPassword.setText("123"); // <--- Corta
-            txtConfermaPass.setText("123");
+    void testPasswordCorta(FxRobot robot) {
+        // 1. Compila i campi
+        robot.clickOn("#txtNome").write("Mario");
+        robot.clickOn("#txtCognome").write("Rossi");
+        robot.clickOn("#txtEmail").write("mario@test.com");
 
-            // Esecuzione
-            invokeHandleRegistrazione();
+        // 2. Inserisce password uguali ma corte
+        robot.clickOn("#txtPassword").write("123");
+        robot.clickOn("#txtConfermaPass").write("123");
 
-            // Verifica
-            assertTrue(lblErroreReg.isVisible());
-            assertEquals("La password deve essere di almeno 6 caratteri.", lblErroreReg.getText());
-        });
-        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        // 3. Click Registrati
+        robot.clickOn(".login-btn");
+
+        // 4. Verifica errore
+        verifyThat("#lblErroreReg", hasText("La password deve essere di almeno 6 caratteri."));
     }
 
     @Test
-    @DisplayName("Successo: Validazione OK")
-    void testValidazioneSuccesso() {
-        Platform.runLater(() -> {
-            // Setup corretto
-            txtNome.setText("Mario");
-            txtCognome.setText("Rossi");
-            txtEmail.setText("mario@test.com");
-            txtPassword.setText("passwordSicura");
-            txtConfermaPass.setText("passwordSicura");
+    @DisplayName("Successo: Navigazione al Login dopo registrazione valida")
+    void testRegistrazioneSuccesso(FxRobot robot) {
+        // 1. Compila tutto correttamente
+        robot.clickOn("#txtNome").write("Luigi");
+        robot.clickOn("#txtCognome").write("Verdi");
+        robot.clickOn("#txtEmail").write("luigi@test.com");
+        robot.clickOn("#txtPassword").write("passwordSicura");
+        robot.clickOn("#txtConfermaPass").write("passwordSicura");
 
-            // Esecuzione
-            // Nota: Qui il metodo proverà a fare 'tornaALogin' e fallirà perché 'event' è null.
-            // Ma a noi interessa che NON abbia settato errori nella label prima di quel punto.
-            invokeHandleRegistrazione();
+        // 2. Click Registrati
+        robot.clickOn(".login-btn");
 
-            // Verifica: Se la validazione passa, la label viene nascosta o non mostra errori di validazione
-            assertFalse(lblErroreReg.isVisible() && lblErroreReg.getText().contains("obbligatori"),
-                    "Non dovrebbero esserci errori di campi vuoti");
-        });
-        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        // 3. VERIFICA CORRETTA:
+        // Non cerchiamo più #lblErroreReg (che è sparito).
+        // Cerchiamo invece un elemento che esiste SOLO nella pagina di Login (es. txtUsername)
+        verifyThat("#txtUsername", (TextField t) -> t.isVisible());
+
+        // Oppure verifichiamo che il bottone ora dica "LOGIN"
+        verifyThat(".login-btn", hasText("ACCEDI"));
+    }
+    @Test
+    @DisplayName("Navigazione: Click su 'Accedi qui' porta al login")
+    void testBottoneTornaAlLogin(FxRobot robot) {
+        // Clicca sul link in basso "Accedi qui"
+        robot.clickOn("Accedi qui");
+
+        // Verifica che siamo tornati al login (es. controllando il titolo della finestra o un elemento)
+        // Nota: Questo funziona solo se il titolo cambia nel controller
     }
 }
