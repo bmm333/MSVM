@@ -13,7 +13,7 @@ public class VmStateSnapshotTest {
     {
         //setup
         Memory mem=new Memory(256);
-        OperandStack stack=new OperandStack();
+        OperandStack stack=new OperandStack(128);
         Cpu cpu=new Cpu(mem,stack);
         VmRunner runner=new VmRunner(cpu);
         //Modifico lo stato Reale iniziale
