@@ -12,7 +12,7 @@ public class App extends Application {
     public void start(Stage stage) throws Exception {
         //Carico il file Home.fxml
 
-        FXMLLoader home= new FXMLLoader(App.class.getResource("ui/home.fxml"));
+        FXMLLoader home= new FXMLLoader(App.class.getResource("ui/homepage/home.fxml"));
 
         Scene scene = new Scene(home.load(),1024,768);
 
