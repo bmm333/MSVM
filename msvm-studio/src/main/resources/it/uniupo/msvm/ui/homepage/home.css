@@ -2,7 +2,7 @@
 
 /* Sfondo generale: Bianco sporco per far risaltare le card */
 .main-background {
-    -fx-background-color: #f4f6f8;
+    -fx-background-color: #2a2828;
 }
 
 /* --- 1. HEADER (La Card di Benvenuto) --- */
