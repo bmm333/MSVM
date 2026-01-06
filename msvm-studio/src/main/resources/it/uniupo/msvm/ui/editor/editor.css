@@ -1,182 +1,115 @@
-.root-container {
-    -fx-background-color: #1c1c1e;
+
+.root {
+    -fx-base: #1c1c1e;
+    -fx-background: #1c1c1e;
+    -fx-control-inner-background: #2c2c2e;
+    -fx-text-fill: #ffffff;
+
+    -fx-font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', sans-serif;
+    -fx-font-size: 13px;
+}
+
+
+.card-panel {
+    -fx-background-color: #2c2c2e;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 2);
+    -fx-padding: 10;
 }
 
 .toolbar-container {
-}
-
-.app-title {
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-text-fill: white;
-}
-
-.status-bar {
-    -fx-background-color: #2c2c2e;
-    -fx-background-radius: 8;
-    -fx-padding: 5 15;
-}
-
-.status-label {
-    -fx-text-fill: #8e8e93;
-    -fx-font-weight: bold;
-}
-
-.main-split-pane {
-    -fx-background-color: transparent;
-    -fx-padding: 10;
-}
-
-.transparent-scroll-pane {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-}
-
-.memory-grid {
-    -fx-padding: 5;
-}
-
-.legend-box {
-    -fx-padding: 5 0 0 0;
-}
-
-.legend-label {
-    -fx-font-size: 10px;
-}
-
-.legend-code {
-    -fx-text-fill: #0a84ff;
-}
-
-.legend-data {
-    -fx-text-fill: #30d158;
-}
-
-.legend-empty {
-    -fx-text-fill: #48484a;
-}
-
-.inner-split-pane {
-    -fx-background-color: transparent;
-}
-
-.lifo-label {
-    -fx-text-fill: #48484a;
-    -fx-font-size: 9px;
-}
-
-.root-pane {
     -fx-background-color: #1c1c1e;
+    -fx-padding: 15 20;
+    -fx-alignment: center-left;
 }
 
-.app-title {
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
+
+.button {
+    -fx-background-color: #3a3a3c;
     -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-font-weight: 600;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+    -fx-effect: none;
 }
 
-.status-bar {
-    -fx-background-color: #2c2c2e;
-    -fx-background-radius: 8;
-    -fx-padding: 5 15;
+.button:hover {
+    -fx-background-color: #48484a;
 }
 
-.status-label {
+.button:pressed {
+    -fx-background-color: #636366;
+}
+
+.run-btn {
+    -fx-text-fill: #30d158;
+    -fx-background-color: rgba(48, 209, 88, 0.15);
+}
+.run-btn:hover { -fx-background-color: rgba(48, 209, 88, 0.25); }
+
+.step-btn {
+    -fx-text-fill: #0a84ff;
+    -fx-background-color: rgba(10, 132, 255, 0.15);
+}
+
+.reset-btn {
+    -fx-text-fill: #ff453a;
+    -fx-background-color: rgba(255, 69, 58, 0.15);
+}
+
+
+.header-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #8e8e93;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 0.5px;
+    -fx-padding: 0 0 8 0;
+}
+
+.data-value {
+    -fx-font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    -fx-font-size: 14px;
+    -fx-text-fill: #ffffff;
+}
+
+.code-area, .console-area {
+    -fx-font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    -fx-font-size: 13px;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.console-area {
+    -fx-text-fill: #30d158;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+.table-view .column-header .label {
     -fx-text-fill: #8e8e93;
     -fx-font-weight: bold;
+    -fx-font-size: 11px;
 }
-
-.main-split-pane {
+.table-row-cell {
     -fx-background-color: transparent;
-    -fx-padding: 10;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #3a3a3c;
+}
+.table-row-cell:selected {
+    -fx-background-color: #0a84ff;
+    -fx-background-radius: 4;
 }
 
-.transparent-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
+.scroll-bar:vertical .thumb, .scroll-bar:horizontal .thumb {
+    -fx-background-color: #636366;
+    -fx-background-radius: 10;
 }
-
-.memory-grid-pane {
-    -fx-padding: 5;
-}
-
-.legend-container {
-    -fx-padding: 5 0 0 0;
-}
-
-.legend-code {
-    -fx-text-fill: #0a84ff;
-    -fx-font-size: 10px;
-}
-
-.legend-data {
-    -fx-text-fill: #30d158;
-    -fx-font-size: 10px;
-}
-
-.legend-empty {
-    -fx-text-fill: #48484a;
-    -fx-font-size: 10px;
-}
-
-.inner-split {
-    -fx-background-color: transparent;
-}
-
-.root-pane {
-    -fx-background-color: #1c1c1e;
-}
-
-.app-title {
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-text-fill: white;
-}
-
-.status-bar {
-    -fx-background-color: #2c2c2e;
-    -fx-background-radius: 8;
-    -fx-padding: 5 15;
-}
-
-.status-label {
-    -fx-text-fill: #8e8e93;
-    -fx-font-weight: bold;
-}
-
-.main-split-pane {
-    -fx-background-color: transparent;
-    -fx-padding: 10;
-}
-
-.transparent-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-}
-
-.memory-grid-pane {
-    -fx-padding: 5;
-}
-
-.legend-container {
-    -fx-padding: 5 0 0 0;
-}
-
-.legend-code {
-    -fx-text-fill: #0a84ff;
-    -fx-font-size: 10px;
-}
-
-.legend-data {
-    -fx-text-fill: #30d158;
-    -fx-font-size: 10px;
-}
-
-.legend-empty {
-    -fx-text-fill: #48484a;
-    -fx-font-size: 10px;
-}
-
-.inner-split {
-    -fx-background-color: transparent;
-}
+.scroll-bar { -fx-background-color: transparent; }

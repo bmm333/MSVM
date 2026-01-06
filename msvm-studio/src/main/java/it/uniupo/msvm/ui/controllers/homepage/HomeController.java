@@ -176,6 +176,7 @@ public class HomeController {
         //TODO: Crea un database per i server per i progetti della community
     }
 
+
     /**
      * Gestisce l'apertura della finestra di Login/Autenticazione.
      * <p>
