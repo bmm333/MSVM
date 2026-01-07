@@ -54,7 +54,7 @@
                         </graphic>
                     </Button>
 
-                    <Button fx:id="btnApriFile" maxWidth="Infinity" onAction="#handleApriFile" styleClass="menu-button" text="📂  Apri Progetto..." >
+                    <Button fx:id="btnApriFile" maxWidth="Infinity" onAction="#handleApriFile" styleClass="menu-button" text=" Apri Progetto..." >
                         <graphic>
                             <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                 <image>
