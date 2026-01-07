@@ -19,7 +19,7 @@
             <HBox alignment="CENTER_LEFT" spacing="20">
                 <VBox alignment="CENTER_LEFT" styleClass="header-welcome-box" HBox.hgrow="ALWAYS">
                     <Label styleClass="header-text" text="Benvenuto in MSVM Community" />
-                    <Label opacity="0.8" text="Gestisci i tuoi progetti ed esplora le risorse." textFill="#2e7d32" />
+                    <Label opacity="0.8" text="Gestisci i tuoi progetti ed esplora le risorse." textFill="#ffffff"/>
                 </VBox>
 
                 <Button onAction="#handleLogin" styleClass="profile-button">
