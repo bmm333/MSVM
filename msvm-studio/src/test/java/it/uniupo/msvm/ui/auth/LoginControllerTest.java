@@ -16,7 +16,6 @@ import org.testfx.framework.junit5.Start;
 
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.control.LabeledMatchers.hasText;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test di Integrazione UI per il Login.
