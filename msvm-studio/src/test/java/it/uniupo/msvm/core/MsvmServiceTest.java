@@ -55,6 +55,7 @@ class MsvmServiceTest {
 
     @Test
     void testLoadCodeWhileRunningThrowsException() {
+        service.setFrequency(1); //prevenzione del race condition
         service.loadCode("HALT");
         service.run();
 
