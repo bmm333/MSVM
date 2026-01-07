@@ -2,17 +2,13 @@ package it.uniupo.msvm.core.assembler;
 
 import it.uniupo.msvm.core.exceptions.VmException;
 import it.uniupo.msvm.core.instructions.Opcode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
- * Responsabile della traduzione del codice Assembly in bytecode macchina.
- * Implementa un algoritmo a due passaggi (Two-Pass) per supportare la risoluzione
- * delle etichette simboliche (Label).
- *
- * @author Arben Mema
+ * The Assembler class is responsible for assembling assembly-like language into bytecode.
+ * It processes source code, parses its instructions, and outputs a corresponding
+ * bytecode array. The assembler supports labels, instructions, and optional preprocessing.
  */
 public class Assembler {
     /**
@@ -20,35 +16,82 @@ public class Assembler {
      * La chiave è il nome della label (es. "LOOP"), il valore è l'indice nell'array del bytecode.
      */
     private final Map<String, Integer> symbolTable = new HashMap<>();
+
+    private final Preprocessor preprocessor;
+
+    public Assembler() {
+        this(null);
+    }
+
+    public Assembler(Preprocessor preprocessor) {
+        this.preprocessor = preprocessor;
+    }
+
+
     /**
-     * Trasforma un programma Assembly in un array di int.
-     * Esegue l'assemblaggio in due fasi:
-     * <ol>
-     * <li>Scansione per identificare le etichette e calcolare gli indirizzi.</li>
-     * <li>Generazione effettiva del bytecode e risoluzione dei salti.</li>
-     * </ol>
+     * Entry point di convenienza per compilare codice sorgente fornito come stringa grezza.
+     * <p>
+     * Questo metodo funge da wrapper: normalizza l'input dividendolo in righe (basandosi sul carattere
+     * di fine riga) e delega l'elaborazione al metodo principale {@link #assemble(List)}.
+     * </p>
+     * <p>
+     * <b>Nota:</b> Anche utilizzando questo metodo, la pipeline completa (incluso il Preprocessing
+     * e la risoluzione degli {@code @import}) viene eseguita regolarmente.
+     * </p>
      *
-     * @param source il codice sorgente completo.
-     * @return L'array di bytecode pronto per la VM.
-     * @throws VmException se vengono rilevati errori di sintassi o label non definite.
+     * @param source Il codice Assembly completo sotto forma di stringa unica.
+     * @return L'array di bytecode generato. Restituisce un array vuoto se l'input è null o vuoto.
+     * @throws VmException In caso di errori di sintassi, label duplicate o dipendenze mancanti
+     * propagati dalla pipeline principale.
+     * @see #assemble(List)
      */
     public int[] assemble(String source) {
         if (source == null || source.isBlank()) {
             return new int[0];
         }
-
-        // Pulizia e normalizzazione delle righe
-        String[] lines = source.split("\n");
-        // Pulisce la tabella dei simboli prima di iniziare
+        // Wrapper: converte in lista e chiama il metodo "vero"
+        return assemble(Arrays.asList(source.split("\n")));
+    }
+    /**
+     * Entry point  che accetta una lista di righe di codice.
+     * <p>
+     * Questo metodo orchestra l'intera pipeline di compilazione:
+     * <ol>
+     * <li><b>Preprocessing:</b> Se un preprocessor è configurato, espande gli import e processa le macro.</li>
+     * <li><b>Assemblaggio:</b> Esegue la logica standard a due passaggi (Two-Pass) sui dati processati.</li>
+     * </ol>
+     * </p>
+     *
+     * @param lines Le righe del codice sorgente (potenzialmente contenenti direttive come {@code @import}).
+     * @return L'array di bytecode compilato pronto per l'esecuzione.
+     * @throws VmException se si verificano errori durante il preprocessing (es. libreria non trovata)
+     * o durante l'assemblaggio (es. sintassi errata, label duplicate).
+     */
+    public int[] assemble(List<String>lines)
+    {
+        //prima fase Preprocessing
+        if(preprocessor!=null)
+        {
+            try{
+                lines=preprocessor.process(lines);
+            }catch (Exception e){
+                throw new VmException("Preprocessor Error: " + e.getMessage());
+            }
+        }
+        //Seconda fase Assemblaggio (Core logic)
+        //converto in array per mantenere compatibilita con la logica precedente
+        String[] linesArray=lines.toArray(new String[0]);
         symbolTable.clear();
 
-        try {
-            //PRIMO PASSAGGIO: Mappatura Label
-            firstPass(lines);
-            //SECONDO PASSAGGIO: Generazione Bytecode
-            return secondPass(lines);
-        } catch (Exception e) {
-            throw new VmException("Errore durante l'assemblaggio: " + e.getMessage());
+        try{
+            //mappatura label (firstpass)
+            firstPass(linesArray);
+            //Generazione Bytecode(Secondpass)
+            return secondPass(linesArray);
+        }catch (Exception e){
+            //Evitiamo di wrappare una vmexception dentro un altra
+            if(e instanceof VmException) throw (VmException)e;
+            throw new VmException("Assembler Error: " + e.getMessage());
         }
     }
 
@@ -60,7 +103,7 @@ public class Assembler {
      * per ogni istruzione e argomento, senza scrivere nulla. Quando trova una label (es. "LOOP:"),
      * salva la posizione corrente nella mappa.
      * V1.1 del first pass include anche lindirizzo della riga per errori per un migliore DX (dev experience),
-     * popolando  la {@link #symbolTable} con indirizzi delle etichette.
+     * popolando la {@link #symbolTable} con indirizzi delle etichette.
      * </p>
      *
      * @param lines le righe del codice sorgente.

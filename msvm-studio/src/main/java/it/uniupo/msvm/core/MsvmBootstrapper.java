@@ -1,6 +1,11 @@
 package it.uniupo.msvm.core;
 
 import it.uniupo.msvm.core.assembler.Assembler;
+import it.uniupo.msvm.core.assembler.ImportResolver;
+import it.uniupo.msvm.core.assembler.Preprocessor;
+import it.uniupo.msvm.core.assembler.impl.HybridImportResolver;
+import it.uniupo.msvm.core.assembler.impl.LocalImportResolver;
+import it.uniupo.msvm.core.assembler.impl.RmiImportResolver;
 import it.uniupo.msvm.core.cpu.Cpu;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.memory.Memory;
@@ -8,6 +13,9 @@ import it.uniupo.msvm.core.memory.OperandStack;
 import it.uniupo.msvm.core.runtime.VmRunner;
 import it.uniupo.msvm.core.instructions.Opcode;
 import it.uniupo.msvm.core.instructions.impl.*;
+
+import java.util.List;
+
 /**
  * Bootstrapper (Factory)
  * <p>
@@ -34,7 +42,13 @@ public class MsvmBootstrapper {
         //runtime
         VmRunner runner=new VmRunner(cpu); //polimorfismo vmrunner accetta vmbackend
         runner.setFrequency(DEFAULT_CLOCK_HZ);
-        Assembler assembler=new Assembler();
+        //Assembler & Preprocessing Wiring
+        LocalImportResolver local=new LocalImportResolver("./libs");
+        //Non ancora implementato
+        RmiImportResolver remote = new RmiImportResolver("localhost",1099,"MsvmRepo");
+        HybridImportResolver strategy = new HybridImportResolver(local, remote);
+        Preprocessor preprocessor=new Preprocessor(strategy);
+        Assembler assembler=new Assembler(preprocessor);
         //service injection
         return new MsvmService(memory, cpu, runner, assembler);
 
