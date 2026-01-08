@@ -1,115 +1,297 @@
-
+/* =============================================================================
+   1. GLOBAL VARIABLES & RESET
+   ============================================================================= */
 .root {
-    -fx-base: #1c1c1e;
-    -fx-background: #1c1c1e;
-    -fx-control-inner-background: #2c2c2e;
-    -fx-text-fill: #ffffff;
+    /* --- COLOR PALETTE (Modern Dark) --- */
+    -fx-base: #1e1e1e;              /* Sfondo principale (VS Code Style) */
+    -fx-background: #1e1e1e;
+    -fx-control-inner-background: #1e1e1e;
 
-    -fx-font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', sans-serif;
+    /* --- MEMORY COLORS (Definiti qui per coerenza totale) --- */
+    -color-code: #3794ff;           /* Blu Elettrico (Code) */
+    -color-data: #2ea043;           /* Verde GitHub (Data) */
+    -color-empty: #303030;          /* Grigio Scuro (Empty) */
+    -color-accent: #007acc;         /* Blu VS Code per selezioni */
+
+    /* --- TYPOGRAPHY --- */
+    -fx-font-family: 'Segoe UI', 'Inter', system, sans-serif;
     -fx-font-size: 13px;
+    -fx-text-fill: #cccccc;         /* Testo grigio chiaro riposante */
 }
 
+/* Rimuove i focus blu di default brutti */
+.root, .button, .text-area {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* =============================================================================
+   2. LAYOUT & PANELS
+   ============================================================================= */
+.toolbar-container {
+    -fx-background-color: #252526; /* Leggermente più chiaro dello sfondo */
+    -fx-padding: 10 20;
+    -fx-border-color: #333333;
+    -fx-border-width: 0 0 1 0;
+}
 
 .card-panel {
-    -fx-background-color: #2c2c2e;
-    -fx-background-radius: 10;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 2);
+    -fx-background-color: #252526;
+    -fx-background-radius: 6;      /* Bordi leggermente arrotondati */
+    -fx-border-color: #333333;     /* Bordo sottile invece di ombre pesanti */
+    -fx-border-radius: 6;
     -fx-padding: 10;
 }
-
-.toolbar-container {
-    -fx-background-color: #1c1c1e;
-    -fx-padding: 15 20;
-    -fx-alignment: center-left;
-}
-
-
-.button {
-    -fx-background-color: #3a3a3c;
-    -fx-text-fill: white;
-    -fx-background-radius: 6;
-    -fx-font-weight: 600;
-    -fx-padding: 6 12;
-    -fx-cursor: hand;
-    -fx-border-width: 0;
-    -fx-effect: none;
-}
-
-.button:hover {
-    -fx-background-color: #48484a;
-}
-
-.button:pressed {
-    -fx-background-color: #636366;
-}
-
-.run-btn {
-    -fx-text-fill: #30d158;
-    -fx-background-color: rgba(48, 209, 88, 0.15);
-}
-.run-btn:hover { -fx-background-color: rgba(48, 209, 88, 0.25); }
-
-.step-btn {
-    -fx-text-fill: #0a84ff;
-    -fx-background-color: rgba(10, 132, 255, 0.15);
-}
-
-.reset-btn {
-    -fx-text-fill: #ff453a;
-    -fx-background-color: rgba(255, 69, 58, 0.15);
-}
-
 
 .header-label {
     -fx-font-size: 11px;
     -fx-font-weight: 700;
-    -fx-text-fill: #8e8e93;
+    -fx-text-fill: #858585;        /* Grigio scuro per i titoli (meno invasivo) */
     -fx-text-transform: uppercase;
     -fx-letter-spacing: 0.5px;
     -fx-padding: 0 0 8 0;
 }
 
-.data-value {
-    -fx-font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    -fx-font-size: 14px;
-    -fx-text-fill: #ffffff;
-}
+/* =============================================================================
+   3. MEMORY VISUALIZATION (CORREZIONE COLORI)
+   ============================================================================= */
+/* La griglia */
+.memory-grid-pane { -fx-background-color: transparent; }
 
-.code-area, .console-area {
-    -fx-font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    -fx-font-size: 13px;
-    -fx-background-color: transparent;
+/* LE CELLE (Quadratini) */
+.memory-cell {
+    -fx-min-width: 14px;
+    -fx-min-height: 14px;
+    -fx-background-radius: 2;
+    -fx-cursor: hand;
+}
+.memory-cell-empty { -fx-background-color: -color-empty; }
+.memory-cell-code  { -fx-background-color: -color-code; }
+.memory-cell-data  { -fx-background-color: -color-data; }
+
+/* Effetto Hover sui quadratini */
+.memory-cell:hover { -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.2), 5, 0, 0, 0); }
+
+/* LA LEGENDA (Pallini) - Ora usano le STESSE variabili */
+/* Il pallino stesso */
+.dot {
+    -fx-min-width: 8px;    /* Dimensione fissa piccola */
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;    /* Impedisce che si allarghi */
+    -fx-max-height: 8px;
+
+    -fx-background-radius: 50%; /* Cerchio perfetto */
     -fx-background-insets: 0;
+    -fx-padding: 0;        /* Rimuove spazi interni che disallineano */
 }
 
+/* Colori specifici (usano le variabili definite in alto) */
+.dot-code  { -fx-background-color: -color-code; }
+.dot-data  { -fx-background-color: -color-data; }
+.dot-empty { -fx-background-color: -color-empty; }
+
+/* Il testo della legenda */
+.legend-label {
+    -fx-font-size: 11px;       /* Testo piccolo e pulito */
+    -fx-text-fill: #858585;    /* Grigio scuro per non distrarre */
+    -fx-font-weight: 600;      /* Leggermente grassetto per leggibilità */
+    -fx-padding: 0;            /* Rimuove padding extra */
+}
+
+.legend-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #aaaaaa;
+}
+
+/* =============================================================================
+   4. EDITOR & CONSOLE
+   ============================================================================= */
+.code-area, .console-area {
+    -fx-font-family: 'Consolas', 'JetBrains Mono', monospace;
+    -fx-font-size: 14px;
+    -fx-text-fill: #d4d4d4;
+    -fx-highlight-fill: -color-accent;
+}
+
+/* Console specifica */
 .console-area {
-    -fx-text-fill: #30d158;
+    -fx-text-fill: #ce9178; /* Colore "Stringa" tipico degli IDE (arancio/rosa) */
 }
 
+/* =============================================================================
+   5. BUTTONS (Clean & Flat)
+   ============================================================================= */
+.button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cccccc;
+    -fx-font-weight: 600;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 6 12;
+    -fx-border-width: 1;
+    -fx-border-color: transparent;
+}
+
+.button:hover {
+    -fx-background-color: #3e3e42; /* Hover grigio scuro */
+    -fx-text-fill: white;
+}
+
+/* Bottoni specifici con accenti colorati SOLO sul testo o bordo */
+.run-btn { -fx-text-fill: #4ade80; } /* Verde acceso */
+.run-btn:hover { -fx-background-color: rgba(74, 222, 128, 0.1); }
+
+.step-btn { -fx-text-fill: #60a5fa; } /* Blu acceso */
+.step-btn:hover { -fx-background-color: rgba(96, 165, 250, 0.1); }
+
+.reset-btn { -fx-text-fill: #f87171; } /* Rosso acceso */
+.reset-btn:hover { -fx-background-color: rgba(248, 113, 113, 0.1); }
+
+/* =============================================================================
+   6. STACK & TABLES
+   ============================================================================= */
+
+
+/* --- REAL STACK SIMULATION --- */
+
+/* --- STACK VISUALIZATION (Compatibile con il tuo codice Java) --- */
+
+.stack-container {
+    -fx-padding: 10;
+    -fx-spacing: 5;
+}
+
+/* Il blocco generico (stack-block) */
+.stack-block {
+    -fx-background-color: #2d2d2d;
+    -fx-background-radius: 4;
+    -fx-border-color: #3e3e42;
+    -fx-border-radius: 4;
+    -fx-padding: 8 12;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Il blocco in cima (stack-block-top) */
+.stack-block-top {
+    -fx-background-color: rgba(10, 132, 255, 0.15); /* Blu trasparente */
+    -fx-border-color: #0a84ff; /* Bordo Blu Elettrico */
+    -fx-effect: dropshadow(three-pass-box, rgba(10, 132, 255, 0.25), 8, 0, 0, 0);
+}
+
+/* Il valore numerico (stack-value) */
+.stack-value {
+    -fx-font-family: 'Consolas', monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* L'indirizzo offset (stack-address) */
+.stack-address {
+    -fx-font-family: 'Consolas', monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: #858585; /* Grigio scuro */
+}
+
+/* Etichetta Stack Vuoto (stack-empty-label) */
+.stack-empty-label {
+    -fx-text-fill: #666;
+    -fx-font-style: italic;
+    -fx-padding: 20;
+    -fx-alignment: CENTER;
+}
+
+/* Table View pulita */
 .table-view {
     -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 .table-view .column-header-background {
-    -fx-background-color: transparent;
+    -fx-background-color: #252526;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #3e3e42;
 }
 .table-view .column-header .label {
-    -fx-text-fill: #8e8e93;
+    -fx-text-fill: #858585;
     -fx-font-weight: bold;
     -fx-font-size: 11px;
 }
 .table-row-cell {
     -fx-background-color: transparent;
+    -fx-border-color: #333333;
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: #3a3a3c;
 }
-.table-row-cell:selected {
-    -fx-background-color: #0a84ff;
+.table-cell {
+    -fx-text-fill: #cccccc;
+    -fx-font-family: 'Consolas', monospace;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* =============================================================================
+   7. SCROLLBARS (Minimali)
+   ============================================================================= */
+.scroll-bar { -fx-background-color: transparent; }
+.scroll-bar .thumb { -fx-background-color: #424242; -fx-background-radius: 10; }
+.scroll-bar .thumb:hover { -fx-background-color: #4f4f4f; }
+.transparent-scroll > .viewport { -fx-background-color: transparent; }
+
+/* =============================================================================
+   8. MENU BAR STYLING (Dark Mode)
+   ============================================================================= */
+
+/* La barra orizzontale principale */
+.custom-menu-bar {
+    -fx-background-color: #1e1e1e; /* Stesso colore dello sfondo root */
+    -fx-padding: 0 5 0 5;
+    -fx-border-color: #333333;
+    -fx-border-width: 0 0 1 0; /* Linea sottile sotto il menu */
+}
+
+/* I pulsanti "File", "Modifica" nella barra */
+.custom-menu-bar .menu-button {
+    -fx-background-color: transparent;
+    -fx-padding: 8 10;
+}
+
+.custom-menu-bar .menu-button:hover,
+.custom-menu-bar .menu-button:showing {
+    -fx-background-color: #333333; /* Evidenziazione al passaggio */
     -fx-background-radius: 4;
 }
-/*Git ddint push*/
-.scroll-bar:vertical .thumb, .scroll-bar:horizontal .thumb {
-    -fx-background-color: #636366;
-    -fx-background-radius: 10;
+
+/* Il testo "File", "Modifica" */
+.custom-menu-bar .label {
+    -fx-text-fill: #cccccc;
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
 }
-.scroll-bar { -fx-background-color: transparent; }
+
+/* --- IL MENU A TENDINA (Dropdown) --- */
+.context-menu {
+    -fx-background-color: #252526; /* Sfondo del menu aperto */
+    -fx-border-color: #454545;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+    -fx-padding: 5 0;
+}
+
+/* Le singole voci del menu (MenuItem) */
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 8 15;
+}
+
+.menu-item:focused {
+    -fx-background-color: #094771; /* Blu scuro quando ci passi sopra col mouse */
+}
+
+.menu-item .label {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-size: 12px;
+}
+
+/* Separatori (linee orizzontali nel menu) */
+.separator-menu-item .line {
+    -fx-border-color: #454545;
+    -fx-border-width: 1 0 0 0;
+}

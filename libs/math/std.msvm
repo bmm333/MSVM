@@ -1,0 +1,4 @@
+; --- LIBRERIA MATH STD ---
+PUSH 42
+ADD
+; Questa lib aggiunge 42 a qualsiasi cosa ci sia nello stack

@@ -1,17 +1,18 @@
-/*
-* Sara da redifinire giustamente
-* @lucalupi gli sto creando ora per fare i test della CPU
-*
-* */
-
-
+/**
+ * Enumerazione che definisce il set di istruzioni (ISA) della macchina virtuale.
+ * <p>
+ * Ogni Opcode è associato a un byte univoco e al numero di argomenti che richiede.
+ * Questo enum funge da tabella di decodifica principale per la CPU.
+ * </p>
+ */
 package it.uniupo.msvm.core.instructions;
 
 public enum Opcode {
     //istruzioni stack
     PUSH(0x01,1),
     POP(0x02),
-
+    DUP(0x10),
+    SWAP(0x11),
     //istruzioni aritmetiche
     ADD(0x03),
     SUB(0x04),

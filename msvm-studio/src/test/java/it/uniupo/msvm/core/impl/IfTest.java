@@ -1,110 +1,106 @@
 package it.uniupo.msvm.core.impl;
 
-import it.uniupo.msvm.core.instructions.impl.*;
+import it.uniupo.msvm.core.instructions.impl.Ifgt;
+import it.uniupo.msvm.core.instructions.impl.Iflt;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class IfTest extends InstructionTestBase{
+/**
+ * Suite di test per le istruzioni di Branching Condizionale (IFGT, IFLT).
+ * <p>
+ * Verifica la logica di confronto e salto.
+ * Le istruzioni utilizzano indirizzamento ASSOLUTO.
+ * </p>
+ *
+ * @author Luca Lupi  modificato da Arben Mema
+ */
+@DisplayName("Test Unità: Branching (IFGT/IFLT)")
+public class IfTest extends InstructionTestBase {
 
     /**
      * Testa l'istruzione IFGT (Branch if Greater Than).
      * <p>
      * Scenario: 20 > 10.
-     * <br>
-     * <strong>Ordine Stack:</strong>
-     * <ul>
-     * <li>PUSH 20 (b - sotto)</li>
-     * <li>PUSH 10 (a - cima)</li>
-     * </ul>
-     * Condizione: <code>b > a</code> (20 > 10) -> <strong>VERO</strong>. Deve saltare.
+     * Stack: [20 (b), 10 (a)] -> b > a -> VERO.
+     * Deve saltare all'indirizzo assoluto specificato.
      * </p>
      */
     @Test
     @DisplayName("IFGT - Salta se Maggiore (20 > 10)")
-    void testIfgtTrue() {
-        // SETUP
-        cpu.push(20); // b
-        cpu.push(10); // a
+    void testIfgtJumpWhenGreater() {
+        int startIp = 10;
+        int targetAddress = 25;
 
-        cpu.setIp(10);
-        memory.write(10, 5); // Offset di salto
+        // SETUP
+        cpu.push(20); // b (valore sotto)
+        cpu.push(10); // a (valore sopra)
+
+        injectInstructionArgument(startIp, targetAddress);
 
         // EXECUTE
         new Ifgt().execute(ctx);
 
         // VERIFY
-        // Deve saltare: IP = (10 + 1) + 5 = 16 (oppure 17 se fetchNextByte incrementa prima)
-        // Verifichiamo la tua logica: fetchNextByte() porta IP a 11. Poi 11 + 5 = 16.
-        // Se hai corretto fetchNextByte come suggerito, l'IP base è quello DOPO l'argomento.
-        assertEquals(16, cpu.getIp(), "20 > 10 è vero, doveva saltare (+5)");
+        assertEquals(targetAddress, cpu.getIp(), "20 > 10 è vero, doveva saltare all'indirizzo target assoluto");
         assertTrue(cpu.getStackCopy().isEmpty(), "Deve consumare i due operandi dallo stack");
     }
 
     /**
-     * Testa IFGT quando la condizione è FALSA.
+     * Testa l'istruzione IFGT quando la condizione è FALSA.
      * <p>
      * Scenario: 10 > 20 -> FALSO.
+     * Non deve saltare, ma l'IP deve avanzare dopo l'argomento.
      * </p>
      */
     @Test
-    @DisplayName("IFGT - NON Salta se Minore (10 > 20 False)")
-    void testIfgtFalse() {
+    @DisplayName("IFGT - NON Salta se Minore (10 > 20 -> Falso)")
+    void testIfgtNoJumpWhenSmaller() {
+        int startIp = 10;
+        int targetAddress = 25;
+
         cpu.push(10); // b
         cpu.push(20); // a
 
-        cpu.setIp(10);
-        memory.write(10, 5);
+        injectInstructionArgument(startIp, targetAddress);
 
         new Ifgt().execute(ctx);
 
-        // Non deve saltare, ma deve aver consumato l'argomento del salto (byte 10).
-        // Quindi IP deve essere 11.
-        assertEquals(11, cpu.getIp(), "Non doveva saltare, solo avanzare");
-        assertTrue(cpu.getStackCopy().isEmpty(), "Deve consumare gli operandi anche se non salta");
+        // IP deve avanzare di 1 per aver letto l'argomento
+        assertEquals(startIp + 1, cpu.getIp(), "Non doveva saltare, ma avanzare di 1 dopo l'argomento");
+        assertTrue(cpu.getStackCopy().isEmpty());
     }
 
     /**
      * Testa l'istruzione IFLT (Branch if Less Than).
      * <p>
      * Scenario: 10 < 20.
-     * Condizione: <code>b < a</code> (10 < 20) -> <strong>VERO</strong>. Deve saltare.
+     * Stack: [10 (b), 20 (a)] -> b < a -> VERO.
+     * Deve saltare.
      * </p>
      */
     @Test
     @DisplayName("IFLT - Salta se Minore (10 < 20)")
-    void testIfltTrue() {
-        // SETUP
-        cpu.push(10); // b (sotto)
-        cpu.push(20); // a (cima)
+    void testIfltJumpWhenSmaller() {
+        int startIp = 10;
+        int targetAddress = 30;
 
-        cpu.setIp(10);
-        memory.write(10, 5);
+        cpu.push(10); // b
+        cpu.push(20); // a
 
-        // EXECUTE
+        injectInstructionArgument(startIp, targetAddress);
+
         new Iflt().execute(ctx);
 
-        // VERIFY
-        assertEquals(16, cpu.getIp(), "10 < 20 è vero, doveva saltare");
+        assertEquals(targetAddress, cpu.getIp(), "10 < 20 è vero, doveva saltare all'indirizzo target assoluto");
+        assertTrue(cpu.getStackCopy().isEmpty());
     }
 
     /**
-     * Testa IFLT quando la condizione è FALSA.
-     * <p>
-     * Scenario: 20 < 10 -> FALSO.
-     * </p>
+     * Helper per impostare IP e scrivere l'argomento dell'istruzione (target del salto).
      */
-    @Test
-    @DisplayName("IFLT - NON Salta se Maggiore (20 < 10 False)")
-    void testIfltFalse() {
-        cpu.push(20);
-        cpu.push(10);
-
-        cpu.setIp(10);
-        memory.write(10, 5);
-
-        new Iflt().execute(ctx);
-
-        assertEquals(11, cpu.getIp(), "Non doveva saltare");
+    private void injectInstructionArgument(int address, int argumentValue) {
+        cpu.setIp(address);
+        memory.write(address, argumentValue);
     }
 }

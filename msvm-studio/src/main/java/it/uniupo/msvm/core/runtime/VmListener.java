@@ -11,4 +11,10 @@ public interface VmListener {
      * Chiamato se la VM crasha o incontra un errore critico.
      */
     void onVmError(String message);
+
+    /**
+     * Chiamato quando la CPU incontra l'istruzione HALT
+     * e termina l'esecuzione regolarmente.
+     */
+    void onVmHalt();
 }

@@ -5,6 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <BorderPane styleClass="main-background" stylesheets="@home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uniupo.msvm.ui.controllers.homepage.HomeController">
 
     <padding>
@@ -17,7 +19,7 @@
             <HBox alignment="CENTER_LEFT" spacing="20">
                 <VBox alignment="CENTER_LEFT" styleClass="header-welcome-box" HBox.hgrow="ALWAYS">
                     <Label styleClass="header-text" text="Benvenuto in MSVM Community" />
-                    <Label opacity="0.8" text="Gestisci i tuoi progetti ed esplora le risorse." textFill="#2e7d32" />
+                    <Label opacity="0.8" text="Gestisci i tuoi progetti ed esplora le risorse." textFill="#ffffff"/>
                 </VBox>
 
                 <Button onAction="#handleLogin" styleClass="profile-button">
@@ -42,11 +44,35 @@
                 <VBox minWidth="280" spacing="15" styleClass="panel-box">
                     <Label styleClass="section-title" text="Azioni Rapide" />
 
-                    <Button fx:id="btnCreaFile" maxWidth="Infinity" onAction="#handleCreaFile" styleClass="menu-button" text="📄  Nuovo File MSVM" />
+                    <Button fx:id="btnCreaFile" text="Nuovo File MSVM" styleClass="menu-button" maxWidth="Infinity" onAction="#handleCreaFile">
+                        <graphic>
+                            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@images/icons8-paper-48.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
-                    <Button fx:id="btnApriFile" maxWidth="Infinity" onAction="#handleApriFile" styleClass="menu-button" text="📂  Apri Progetto..." />
+                    <Button fx:id="btnApriFile" maxWidth="Infinity" onAction="#handleApriFile" styleClass="menu-button" text=" Apri Progetto..." >
+                        <graphic>
+                            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@images/icons8-directory-48.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
-                    <Button fx:id="btnEsplora" maxWidth="Infinity" onAction="#handleEsplora" styleClass="menu-button" text="☁️  Esplora Community" />
+                    <Button fx:id="btnEsplora" text=" Esplora Community" styleClass="menu-button" maxWidth="Infinity" onAction="#handleEsplora">
+                        <graphic>
+                            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@images/icons8-cloud-32.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
                 </VBox>
 
                 <VBox styleClass="feed-box" HBox.hgrow="ALWAYS">

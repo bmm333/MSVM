@@ -19,17 +19,17 @@ import it.uniupo.msvm.core.instructions.Instruction;
  * </ol>
  *
  * @author Luca Lupi
+ * @author Arben Mema
  */
 public class Iflt implements Instruction {
     @Override
     public void execute(ExecutionContext ctx) {
         int a = ctx.pop();
-        int b= ctx.pop();
-        int jump=ctx.fetchNextByte();
+        int b = ctx.pop();
+        int targetAddress = ctx.fetchNextByte();
 
-        if(b<a){
-            int ip= ctx.getIp();
-            ctx.setIp(ip+jump);
+        if (b < a) {
+            ctx.setIp(targetAddress);
         }
     }
 }

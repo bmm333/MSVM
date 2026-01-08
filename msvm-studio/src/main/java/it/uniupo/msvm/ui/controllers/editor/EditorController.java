@@ -1,16 +1,21 @@
 package it.uniupo.msvm.ui.controllers.editor;
 
+import it.uniupo.msvm.core.MsvmBootstrapper;
+import it.uniupo.msvm.core.MsvmService;
+import it.uniupo.msvm.core.runtime.VmListener;
+import it.uniupo.msvm.core.runtime.VmStateSnapshot;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -28,7 +33,7 @@ import javafx.scene.shape.Rectangle;
  * @author Arben Mema
  * @version 1.2(high density UI update)
  * */
-public class EditorController {
+public class EditorController  implements VmListener {
   //Componenti FXML Editor e console
     /**Area di testo per la scrittura del codice sorgente Assembly*/
     @FXML private TextArea codeEditor;
@@ -49,12 +54,17 @@ public class EditorController {
      * Contiene array di {@link Rectangle} che cambiano colore in base allo stato della cella.
      */
     @FXML private TilePane memoryGrid;
+
+    //Core
+    private MsvmService service;
+
     /** Array di supporto per l'accesso rapido O(1) alle celle grafiche della griglia. */
     private Rectangle[] visualCells;
     /** Dimensione totale della memoria simulata (celle). */
-    private final int MEM_SIZE = 1024;
+    private final int MEM_SIZE = 4096;
     /** Modello dati osservabile per la Tabella della memoria. */
     private ObservableList<MemoryRow> memoryData = FXCollections.observableArrayList();
+
     /**
      * Inizializza il controller dopo che l'elemento radice è stato elaborato completamente.
      * <p>
@@ -64,50 +74,26 @@ public class EditorController {
      */
     @FXML
     public void initialize() {
+        // Configurazione delle colonne
         colAddress.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress()));
         colValue.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getValue()));
+
+        memoryTable.setItems(memoryData);
 
         if(memoryGrid!=null){
             initVisualGrid();
         }
-        // TODO: Rimuovere in produzione, serve solo per visualizzare il layout
-        initFakeData();
-    }
-    /**
-     * Aggiorna la rappresentazione visiva dello Stack degli operandi.
-     * <p>
-     * Pulisce il contenitore grafico e rigenera i blocchi (Card) basandosi sui valori forniti.
-     * L'iterazione avviene in ordine inverso per visualizzare la "Cima" (Top) dello stack in alto.
-     * </p>
-     * @param stackValues Lista dei valori interi attualmente nello stack (dal fondo alla cima).
-     */
-    private void updateVisualStack(java.util.List<Integer> stackValues) {
-        visualStackContainer.getChildren().clear();
-        if (stackValues == null || stackValues.isEmpty()) {
-            Label emptyLabel = new Label("Stack is Empty");
-            emptyLabel.getStyleClass().add("stack-empty-label");
-            visualStackContainer.getChildren().add(emptyLabel);
-            return;
-        }
-        for (int i = stackValues.size() - 1; i >= 0; i--) {
-            int val = stackValues.get(i);
-            boolean isTop = (i == stackValues.size() - 1);
-            HBox block = new HBox();
-            block.getStyleClass().add("stack-block");
-            if (isTop) {
-                block.getStyleClass().add("stack-block-top");
-            }
-            Label valueLbl = new Label(String.valueOf(val));
-            valueLbl.getStyleClass().add("stack-value");
-            Label addrLbl = new Label("offset [" + i + "]");
-            addrLbl.getStyleClass().add("stack-address");
-            if (isTop) addrLbl.setText("TOP [" + i + "]");
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-            block.getChildren().addAll(valueLbl, spacer, addrLbl);
-            visualStackContainer.getChildren().add(block);
+        try{
+            this.service= MsvmBootstrapper.buildProductionInstance();
+            this.service.addListener(this);
+            logToConsole("System: Core Connected succesfully");
+            logToConsole("System: Ready");
+        }catch (Exception e)
+        {
+            logToConsole("Critical ERROR: Could not Start MSVM Core"+ e.getMessage());
         }
     }
+
     /**
      * Inizializza la Griglia Visiva della memoria (Memory Map).
      * <p>
@@ -118,19 +104,28 @@ public class EditorController {
     private void initVisualGrid() {
         visualCells = new Rectangle[MEM_SIZE];
         memoryGrid.getChildren().clear();
-        memoryGrid.setHgap(1);
-        memoryGrid.setVgap(1);
-        memoryGrid.setStyle("-fx-background-color: transparent;");
+        memoryGrid.setHgap(2);
+        memoryGrid.setVgap(2);
+
         for (int i = 0; i < MEM_SIZE; i++) {
-            Rectangle cell = new Rectangle(8, 8);
+            Rectangle cell = new Rectangle(10, 10);
             cell.setFill(Color.web("#333333"));
-            cell.setArcWidth(2);
-            cell.setArcHeight(2);
-            Tooltip.install(cell, new Tooltip("0x" + String.format("%04X", i)));
+            Tooltip.install(cell, new Tooltip("Addr: " + i));
             visualCells[i] = cell;
             memoryGrid.getChildren().add(cell);
         }
     }
+
+    private void resetGridColor() {
+        if(visualCells == null) return;
+        for(Rectangle r : visualCells) r.setFill(Color.web("#333333"));
+    }
+
+    private void logToConsole(String msg) {
+        consoleArea.appendText("\n> " + msg);
+        consoleArea.setScrollTop(Double.MAX_VALUE); // Auto-scroll
+    }
+
     /**
      * Popola l'interfaccia con dati fittizi per scopi di debug e design review.
      * <p>
@@ -152,11 +147,49 @@ public class EditorController {
         }
     }
     /** Gestisce il click sul pulsante "Run". Avvia l'esecuzione continua. */
-    @FXML public void onRun() { consoleArea.appendText("\n> Run clicked!"); }
+    @FXML public void onRun() {
+        try{
+            logToConsole("Compiling & Loading...");
+            //Carica e compila ( Passa per Preprocessor -> Assembler -> RAM)
+            service.loadCode(codeEditor.getText());
+            //Esegui
+            logToConsole("Running...");
+            service.run();
+
+        }catch (Exception e)
+        {
+            logToConsole("Error: "+ e.getMessage());
+            e.printStackTrace();
+        }
+    }
     /** Gestisce il click sul pulsante "Step". Esegue una singola istruzione. */
-    @FXML public void onStep() { consoleArea.appendText("\n> Step clicked!"); }
+    @FXML public void onStep() {
+        try{
+            //Check se la vm non e carica proviamo a caricare il codice corrente
+            if(lblIp.getText().equals("0000")||lblIp.getText().equals("N/A")){
+                service.loadCode(codeEditor.getText());
+            }
+            service.step();
+        }catch (Exception e)
+        {
+            logToConsole("Step Error: "+ e.getMessage());
+        }
+    }
     /** Gestisce il click sul pulsante "Reset". Ripristina lo stato della VM. */
-    @FXML public void onReset() { consoleArea.appendText("\n> Reset clicked!"); }
+    @FXML public void onReset() {
+        try{
+            service.stop(); //ferma
+            //pulisce ui
+            updateVisualStack(new ArrayList<>());
+            memoryData.clear();
+            resetGridColor();
+            lblIp.setText("0000");
+            logToConsole("VM Reset.");
+        }catch (Exception e)
+        {
+            logToConsole("Reset Error: "+ e.getMessage());
+        }
+    }
     /**
      * Imposta il contenuto dell'editor di codice.
      * <p>
@@ -169,6 +202,95 @@ public class EditorController {
     public void setCode(String content) {
         if(content!=null){
             this.codeEditor.setText(content);
+        }
+    }
+
+    /**
+     * Chiamato ogni volta che la VM completa un ciclo (step).
+     *
+     * @param snapshot La foto dello stato attuale (safe per la UI).
+     */
+    @Override
+    public void onVmUpdate(VmStateSnapshot snapshot) {
+        Platform.runLater(()->{
+            lblIp.setText(String.format("%04d",snapshot.ip()));
+            lblStackSize.setText(String.valueOf(snapshot.stack().size()));
+            updateVisualStack(snapshot.stack());
+            updateMemoryView(snapshot.memory(),snapshot.ip());
+        });
+    }
+
+    @Override
+    public void onVmHalt() {
+        Platform.runLater(() -> {
+            logToConsole("=== SYSTEM HALTED ===");
+            logToConsole("Program execution finished successfully.");
+
+            lblIp.setText("END");
+            lblIp.setStyle("-fx-text-fill: red;");
+        });
+    }
+    /**
+     * Chiamato se la VM crasha o incontra un errore critico.
+     *
+     * @param message
+     */
+    @Override
+    public void onVmError(String message) {
+        Platform.runLater(() -> logToConsole("RUNTIME EXCEPTION: " + message));
+    }
+
+    private void updateMemoryView(int[] memory, int currentIp) {
+        // A. Aggiornamento Tabella (Mostriamo solo celle non zero per performance?)
+        // Per ora facciamo un refresh completo delle prime 32 celle + quelle sporche
+        // (Ottimizzazione futura: ObservableMap)
+        memoryData.clear();
+        for (int i = 0; i < memory.length; i++) {
+            if (memory[i] != 0 || i < 16) {
+                memoryData.add(new MemoryRow(
+                        String.format("0x%04X", i),
+                        String.valueOf(memory[i]))
+                );
+            }
+        }
+        if (visualCells != null) {
+            for (int i = 0; i < Math.min(memory.length, visualCells.length); i++) {
+                Rectangle cell = visualCells[i];
+                if (i == currentIp) {
+                    cell.setFill(Color.ORANGE);
+                } else if (memory[i] != 0) {
+                    cell.setFill(Color.CYAN);
+                } else {
+                    cell.setFill(Color.web("#333333"));
+                }
+            }
+        }
+    }
+    private void updateVisualStack(List<Integer> stackValues) {
+        visualStackContainer.getChildren().clear();
+        if (stackValues == null || stackValues.isEmpty()) {
+            Label emptyLabel = new Label("Stack Empty");
+            emptyLabel.setStyle("-fx-text-fill: #666; -fx-padding: 10;");
+            visualStackContainer.getChildren().add(emptyLabel);
+            return;
+        }
+        for (int i = stackValues.size() - 1; i >= 0; i--) {
+            int val = stackValues.get(i);
+            boolean isTop = (i == stackValues.size() - 1);
+
+            HBox block = new HBox();
+            block.getStyleClass().add("stack-block"); // Assicurati di avere questo nel CSS
+            block.setStyle("-fx-background-color: " + (isTop ? "#4CAF50" : "#2E2E2E") + "; " +
+                    "-fx-padding: 5; -fx-border-color: #555; -fx-border-width: 0 0 1 0;");
+
+            Label valueLbl = new Label(String.valueOf(val));
+            valueLbl.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            Label addrLbl = new Label(isTop ? "TOP" : "["+i+"]");
+            addrLbl.setStyle("-fx-text-fill: #aaa; -fx-font-size: 10px;");
+            block.getChildren().addAll(valueLbl, spacer, addrLbl);
+            visualStackContainer.getChildren().add(block);
         }
     }
     /**
@@ -192,4 +314,5 @@ public class EditorController {
         public String getAddress() { return address; }
         public String getValue() { return value; }
     }
+
 }

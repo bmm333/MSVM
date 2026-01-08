@@ -4,25 +4,26 @@ import it.uniupo.msvm.core.instructions.ExecutionContext;
 import it.uniupo.msvm.core.instructions.Instruction;
 
 /**
- * Implementazione dell'istruzione JUMP (Salto Incondizionato Relativo).
+ * Implementazione dell'istruzione JUMP (Salto Incondizionato).
  * <p>
- * Modifica il Program Counter (IP) aggiungendo un offset letto dal bytecode.
- * Il salto è relativo all'istruzione successiva.
+ * Modifica il flusso di esecuzione impostando l'Instruction Pointer (IP)
+ * a un nuovo indirizzo specifico.
  * </p>
- * * <strong>Funzionamento:</strong>
+ * <strong>Funzionamento:</strong>
  * <ol>
- * <li>Legge il byte successivo come offset (signed).</li>
- * <li>Calcola: <code>nuovo_IP = (IP_corrente + 1) + offset</code>.</li>
- * <li>Aggiorna l'IP nel contesto.</li>
+ *     <li>Legge il byte successivo come indirizzo di destinazione (Target Address).</li>
+ *     <li>Sovrascrive l'IP corrente con questo indirizzo.</li>
  * </ol>
- *  @author Luca Lupi
+ *  @author Luca Lupi (DATED VERSION)
+ *  Modified by @author Arben Mema <strong>Nota:</strong> Utilizza indirizzamento ASSOLUTO. L'Assembler risolve le label
+ *  @version 1.1
  */
 public class Jump implements Instruction {
 
     @Override
     public void execute(ExecutionContext ctx) {
-        int jump=ctx.fetchNextByte();
-        int ip= ctx.getIp();
-        ctx.setIp(ip+jump);
+        // L'assembler fornisce l'indirizzo ASSOLUTO della label, non un offset.
+        int targetAddress = ctx.fetchNextByte();
+        ctx.setIp(targetAddress);
     }
 }

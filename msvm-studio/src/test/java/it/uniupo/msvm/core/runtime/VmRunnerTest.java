@@ -26,7 +26,7 @@ public class VmRunnerTest {
     void setup()
     {
         memory=new Memory(256);
-        OperandStack stack=new OperandStack();
+        OperandStack stack=new OperandStack(128);
         cpu = new Cpu(memory, stack);
         runner = new VmRunner(cpu);
         //registriamo istr "Stub" (finte) per testare il motore senza dipendeze esterne
@@ -103,6 +103,15 @@ public class VmRunnerTest {
             public void onVmError(String message) {
                 fail("Non mi aspettavo errori: " + message);
             }
+
+            /**
+             * Chiamato quando la CPU incontra l'istruzione HALT
+             * e termina l'esecuzione regolarmente.
+             */
+            @Override
+            public void onVmHalt() {
+                System.out.println("CPU ha terminato l'esecuzione!");
+            }
         };
 
         //registri la spia
@@ -137,6 +146,15 @@ public class VmRunnerTest {
             public void onVmError(String message) {
                 receivedError[0]=message; //catturo il messaggio
                 errorLatch.countDown(); //segnalare che lérrore e arrivato
+            }
+
+            /**
+             * Chiamato quando la CPU incontra l'istruzione HALT
+             * e termina l'esecuzione regolarmente.
+             */
+            @Override
+            public void onVmHalt() {
+                System.out.println("CPU ha terminato l'esecuzione!");
             }
         });
         //Facciamo un step per causare il crash

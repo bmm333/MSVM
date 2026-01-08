@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p>
  * Verifica la corretta manipolazione del Program Counter (IP) da parte delle istruzioni
  * di salto incondizionato (JUMP) e condizionato (JZ).
+ * Le istruzioni utilizzano indirizzamento ASSOLUTO.
  * </p>
  *
  * @author Luca Lupi
@@ -19,99 +20,73 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControlFlowTest extends InstructionTestBase {
 
     /**
-     * Testa l'istruzione JUMP con un offset positivo (Salto in avanti).
-     * <p>
-     * <strong>Scenario:</strong>
-     * <ul>
-     * <li>IP iniziale: 10</li>
-     * <li>Argomento salto (mem[10]): +5</li>
-     * </ul>
-     * <strong>Calcolo atteso:</strong>
-     * <ol>
-     * <li>Fetch dell'argomento: IP avanza da 10 a 11.</li>
-     * <li>Esecuzione JUMP: <code>(IP_corrente + 1) + offset</code></li>
-     * <li>Risultato: <code>(11 + 1) + 5 = 17</code></li>
-     * </ol>
-     * </p>
+     * Testa l'istruzione JUMP.
+     * Deve impostare l'IP all'indirizzo assoluto specificato come argomento.
      */
     @Test
-    @DisplayName("JUMP - Salto Incondizionato in Avanti (+5)")
-    void testJumpForward() {
-        cpu.setIp(10);
-        memory.write(10, 5); // Scriviamo l'offset di salto
+    @DisplayName("JUMP - Salto Incondizionato (Indirizzo Assoluto)")
+    void testJumpAbsolute() {
+        int startIp = 10;
+        int targetAddress = 16;
+
+        injectInstructionArgument(startIp, targetAddress);
 
         new Jump().execute(ctx);
 
-        assertEquals(16, cpu.getIp(), "L'IP deve avanzare a 16 (11 + 5)");
-    }
-
-    /**
-     * Testa l'istruzione JUMP con un offset negativo (Salto all'indietro / Loop).
-     * <p>
-     * <strong>Scenario:</strong>
-     * <ul>
-     * <li>IP iniziale: 20</li>
-     * <li>Argomento salto (mem[20]): -5</li>
-     * </ul>
-     * <strong>Calcolo atteso:</strong>
-     * <br>
-     * <code>21- 5 = 16</code>
-     * </p>
-     */
-    @Test
-    @DisplayName("JUMP - Salto all'Indietro (Loop -5)")
-    void testJumpBackward() {
-        cpu.setIp(20);
-        memory.write(20, -5); // Scriviamo un offset negativo
-
-        new Jump().execute(ctx);
-
-        assertEquals(16, cpu.getIp(), "L'IP dovrebbe essere tornato indietro a 16");
+        assertEquals(targetAddress, cpu.getIp(), "L'IP deve essere impostato all'indirizzo target assoluto");
     }
 
     /**
      * Testa l'istruzione JZ (Jump if Zero) quando la condizione è VERA.
-     * <p>
-     * Poiché nello stack c'è 0, il salto DEVE essere eseguito.
-     * Il comportamento atteso è identico a un JUMP normale.
-     * </p>
+     * Stack: [0] -> Salto eseguito.
      */
     @Test
     @DisplayName("JZ - Salta se Zero (Condizione VERA)")
-    void testJzTrue() {
+    void testJzJumpWhenZero() {
+        int startIp = 10;
+        int targetAddress = 25;
+
         // Setup condizione: 0 in cima allo stack
         cpu.push(0);
-
-        cpu.setIp(10);
-        memory.write(10, 5);
+        injectInstructionArgument(startIp, targetAddress);
 
         new Jz().execute(ctx);
 
-        assertEquals(16, cpu.getIp(), "Doveva saltare a 16 perché lo stack aveva 0");
+        assertEquals(targetAddress, cpu.getIp(), "Doveva saltare all'indirizzo target perché lo stack aveva 0");
         assertTrue(cpu.getStackCopy().isEmpty(), "JZ deve consumare il valore dallo stack (pop)");
     }
 
     /**
      * Testa l'istruzione JZ (Jump if Zero) quando la condizione è FALSA.
-     * <p>
-     * Poiché nello stack c'è 99 (diverso da 0), il salto NON deve avvenire.
-     * </p>
-     * <strong>Nota sul Program Counter:</strong>
-     * Verifica che l'IP rimanga coerente con l'istruzione successiva.
+     * Stack: [99] -> Salto NON eseguito.
      */
     @Test
     @DisplayName("JZ - NON Salta se diverso da Zero (Condizione FALSA)")
-    void testJzFalse() {
+    void testJzNoJumpWhenNonZero() {
+        int startIp = 10;
+        int targetAddress = 50; // Indirizzo che NON deve essere raggiunto
+
         // Setup condizione: Valore != 0
         cpu.push(99);
-
-        cpu.setIp(10);
-        memory.write(10, 5);
+        injectInstructionArgument(startIp, targetAddress);
 
         new Jz().execute(ctx);
 
-        //Perchè deve fare la cpu lo step in avanti non il jz
-        assertEquals(10, cpu.getIp(), "Non doveva eseguire il salto (offset ignorato)");
+        // L'istruzione legge l'argomento (1 byte), quindi IP avanza di 1
+        int expectedIp = startIp + 1;
+        assertEquals(expectedIp, cpu.getIp(), "Non doveva eseguire il salto, ma l'IP deve avanzare dopo l'argomento");
         assertTrue(cpu.getStackCopy().isEmpty(), "JZ deve consumare il valore dallo stack anche se non salta");
+    }
+
+    /**
+     * Helper method per preparare lo stato della CPU prima dell'esecuzione manuale di un'istruzione.
+     * Imposta l'IP e scrive l'argomento dell'istruzione nella memoria.
+     *
+     * @param address Indirizzo corrente dell'istruzione (dove si trova l'argomento)
+     * @param argumentValue Valore dell'argomento (es. target del salto)
+     */
+    private void injectInstructionArgument(int address, int argumentValue) {
+        cpu.setIp(address);
+        memory.write(address, argumentValue);
     }
 }
