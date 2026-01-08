@@ -56,6 +56,12 @@ public class User implements Serializable {
     private String email;
 
     /**
+     * Ruolo dell'utente
+     */
+    @Getter @Setter
+    private String role;
+
+    /**
      * Costruttore vuoto.
      * <p>
      * Necessario per la serializzazione RMI e per la creazione di istanze
