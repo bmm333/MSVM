@@ -1,7 +1,8 @@
 package it.uniupo.msvm.common.model;
 
-import lombok.Getter;
-import lombok.Setter;
+
+
+
 import java.io.Serializable;
 
 /**
@@ -26,15 +27,12 @@ public class User implements Serializable {
     /**
      * Identificativo univoco dell'utente (es. Primary Key del database).
      */
-    @Getter
-    @Setter
+
     private Long id;
 
     /**
      * Nome utente univoco utilizzato per il login.
      */
-    @Getter
-    @Setter
     private String username;
 
     /**
@@ -44,15 +42,11 @@ public class User implements Serializable {
      * contenere l'hash della password, non la password in chiaro.
      * </p>
      */
-    @Getter
-    @Setter
     private String password;
 
     /**
      * Indirizzo email di contatto dell'utente.
      */
-    @Getter
-    @Setter
     private String email;
 
     /**
@@ -86,6 +80,31 @@ public class User implements Serializable {
         this.email = email;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getId() {
+        return id;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getEmail() {
+        return email;
+    }
     /**
      * Restituisce una rappresentazione in stringa dell'oggetto User.
      * <p>
