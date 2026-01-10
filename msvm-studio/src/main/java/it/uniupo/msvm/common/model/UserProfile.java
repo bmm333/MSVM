@@ -1,7 +1,5 @@
 package it.uniupo.msvm.common.model;
 
-import lombok.Getter;
-import lombok.Setter;
 import java.io.Serializable;
 
 /**
@@ -29,36 +27,31 @@ public class UserProfile implements Serializable {
      * il profilo al corrispondente oggetto {@link User}.
      * </p>
      */
-    @Getter
-    @Setter
+
     private Long userId;
 
     /**
      * Nome di battesimo dell'utente.
      */
-    @Getter
-    @Setter
+
     private String firstName;
 
     /**
      * Cognome dell'utente.
      */
-    @Getter
-    @Setter
+
     private String lastName;
 
     /**
      * Una breve descrizione o biografia dell'utente.
      */
-    @Getter
-    @Setter
+
     private String bio;
 
     /**
      * Numero di telefono di contatto (opzionale).
      */
-    @Getter
-    @Setter
+
     private String phoneNumber;
 
     /**
@@ -85,6 +78,43 @@ public class UserProfile implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public void setFirstName(String firstName){
+        this.firstName=firstName;
+    }
+    public String getFirstName(){
+        return firstName;
+    }
+
+    public void setUserId(Long userId){
+        this.userId=userId;
+    }
+    public Long getUserId(){
+        return userId;
+    }
+
+    public void setLastName(String lastName){
+        this.lastName=lastName;
+    }
+    public String getLastName(){
+        return lastName;
+    }
+
+    public void setBio(String bio){
+        this.bio=bio;
+    }
+
+    public String getBio(){
+        return bio;
+    }
+
+    public void setPhoneNumber(String phoneNumber){
+        this.phoneNumber=phoneNumber;
+    }
+
+    public String getPhoneNumber(){
+        return phoneNumber;
+    }
+
     /**
      * Restituisce una rappresentazione testuale del profilo.
      *
@@ -94,4 +124,4 @@ public class UserProfile implements Serializable {
     public String toString() {
         return "UserProfile [userId=" + userId + ", name=" + firstName + " " + lastName + "]";
     }
-}s
+}

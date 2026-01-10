@@ -52,7 +52,6 @@ public class User implements Serializable {
     /**
      * Ruolo dell'utente
      */
-    @Getter @Setter
     private String role;
 
     /**
