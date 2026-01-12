@@ -7,7 +7,7 @@ import it.uniupo.msvm.common.dto.UserLoginDTO;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface MsvmService  extends Remote {
+public interface MsvmClientService extends Remote {
 
     UserDTO login(UserLoginDTO loginDto)throws RemoteException;
     UserDTO register(UserLoginDTO registerDto)throws RemoteException;
