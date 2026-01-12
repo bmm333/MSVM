@@ -2,6 +2,7 @@ package it.uniupo.msvm.common.api;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.rmi.Remote;
 //attendo il merge di @author Lucaluppi 
 //import it.uniupo.msvm.common.dto.UserDTO;
 
@@ -14,12 +15,12 @@ public interface MsvmRemoteService extends Remote{
     //auth 
     //forse dobbiamo definire sia email che username? per un ux migliore magari possiamo gestirlo in un altro punto e qua normalizziamo
     UserDto login(String email,String password) throws RemoteException;
-    UserDTO singup(String email,String username,String password) throws RemoteException;
+    UserDTO register(String email,String username,String password) throws RemoteException;
     //Library
     /**
-     * scaruca solo il codice sorgente
+     * scarica solo il codice sorgente
      * */
-    String getLibrary(String library) throws RemoteException;
+    String fetchLibrary(String library) throws RemoteException;
     //Get all 
-    List<String> getAvalibleLibraries() throws RemoteException;
+    List<String> getAvailableLibraries() throws RemoteException;
 }
