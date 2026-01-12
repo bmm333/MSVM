@@ -114,6 +114,10 @@ public class DatabaseManager {
             stmt.execute(sqlIndexUser);
             stmt.execute(sqlIndexId);
         }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Error initializing database schema: "+e.getMessage());
+        }
     }
     public void close() {
         try {
