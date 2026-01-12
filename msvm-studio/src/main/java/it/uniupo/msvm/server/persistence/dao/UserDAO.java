@@ -21,7 +21,7 @@ public class UserDAO {
     private final DatabaseManager dbManager;
 
     public UserDAO() {
-        this.dbManager = new DatabaseManager();
+        this.dbManager =DatabaseManager.getInstance();;
     }
 
     /**
