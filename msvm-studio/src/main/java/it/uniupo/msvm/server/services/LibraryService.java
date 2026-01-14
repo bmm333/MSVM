@@ -1,15 +1,26 @@
 package it.uniupo.msvm.server.services;
-
+import it.uniupo.msvm.common.model.Library;
+import it.uniupo.msvm.server.persistence.dao.LibraryDAO;
 import java.util.List;
+import java.util.Optional;
 
-public class LibraryService{
-    public String getLibraryContent(String library)
-    {
-        //return raw string from library
-        //client side we will get the string and create a new file with that content
+public class LibraryService {
+    private final LibraryDAO libraryDAO;
+    public LibraryService() {
+        this.libraryDAO = new LibraryDAO();
     }
-    public List<String> listLibraries()
-    {
-        //ritorna il titolo di tutte le librerie e una loro 250 char description (Readme.md)
+
+    public String getLibraryContent(String libName) {
+        // Rimuoviamo eventuale estensione se l'utente lha messo
+        String cleanName = libName.replace(".msvm", "");
+        Optional<Library> libOpt = libraryDAO.findByName(cleanName);
+        if (libOpt.isEmpty()) {
+            throw new RuntimeException("Libreria non trovata nel database: " + cleanName);
+        }
+        System.out.println("[LibraryService] Serving library: " + cleanName);
+        return libOpt.get().getContent();    }
+
+    public List<String> listLibraries() {
+        return libraryDAO.findAllNames();
     }
 }

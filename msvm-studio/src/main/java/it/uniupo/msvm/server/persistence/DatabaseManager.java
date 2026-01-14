@@ -90,6 +90,22 @@ public class DatabaseManager {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """;
+
+        String sqlCreateLibs = """
+        CREATE TABLE IF NOT EXISTS libraries (
+            name TEXT PRIMARY KEY,
+            content TEXT NOT NULL,
+            description TEXT,
+            version INTEGER DEFAULT 1
+        );
+    """;
+
+        //seeding
+        String sqlSeedLib = """
+        INSERT OR IGNORE INTO libraries (name, content, description) 
+        VALUES ('std', '; Standard Library MSVM\n\n:MATH_PI\n PUSH 3\n RET', 'Libreria Standard');
+    """;
+
         //Querry per gli indici
         //Rende la ricerca per email/username/id O(logN)
         String sqlIndexEmail = "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);";
@@ -113,6 +129,8 @@ public class DatabaseManager {
             stmt.execute(sqlIndexEmail);
             stmt.execute(sqlIndexUser);
             stmt.execute(sqlIndexId);
+            stmt.execute(sqlCreateLibs);
+            stmt.execute(sqlSeedLib);
         }
         catch (SQLException e)
         {

@@ -12,7 +12,7 @@ public class UserDAO {
     private final DatabaseManager dbManager;
 
     public UserDAO() {
-        this.dbManager = new DatabaseManager();
+        this.dbManager = DatabaseManager.getInstance();
     }
     /**
      * Cerca un utente per mail
@@ -39,6 +39,8 @@ public class UserDAO {
             catch (Exception e) {
                 System.err.println("[DAO] Error finding userby email:" + e.getMessage());
             }
+        }catch (Exception e) {
+            System.err.println("[DAO] Error finding userby email:" + e.getMessage());
         }
         return Optional.empty();
     }
