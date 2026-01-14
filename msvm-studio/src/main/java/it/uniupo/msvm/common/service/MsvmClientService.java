@@ -14,4 +14,5 @@ public interface MsvmClientService extends Remote {
 
     FullProfileDTO getProfile(Long userId) throws RemoteException;
     boolean updateProfile(FullProfileDTO profileDto) throws RemoteException;
+
 }
