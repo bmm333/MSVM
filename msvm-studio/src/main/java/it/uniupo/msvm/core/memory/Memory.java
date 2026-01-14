@@ -4,92 +4,97 @@ import java.util.Arrays;
 import it.uniupo.msvm.core.exceptions.MemoryAccessException;
 
 /**
- * Classe dove crea e gestisce la memoria virtuale della nostra macchina virtuale.
- * La classe implementa un interfaccia con delle istruzioni base che servono alla nostra CPU
- * per manipolare i dati presenti.
+ * Gestisce la memoria virtuale della nostra macchina virtuale.
+ * La classe implementa un'interfaccia con istruzioni base utilizzate dalla CPU
+ * per manipolare i dati.
  */
-public class Memory implements MemoryInterface{
+public class Memory implements MemoryInterface {
+    /** Dimensione della memoria. */
     private final int size;
+    /** Array che contiene i dati della memoria. */
     private final int[] data;
 
-
     /**
-     * Costruttore che fa il setup della nostra memoria virtuale
-     * @param size Grandezza della nostra memoria Ram
+     * Costruttore che inizializza la memoria virtuale.
+     *
+     * @param size dimensione della memoria RAM.
      */
     public Memory(int size) {
         this.size = size;
         this.data = new int[this.size];
     }
 
-
     /**
-     * Istruzione read dove reperisce il dato attraverso il suo address
-     * @param address indirizzo di memoria che vuoi leggere
-     * @return Ritorna il dato che vuoi leggere
-     * @throws MemoryAccessException indirizzo non valido o valore negativo o maggiore della size
+     * Legge un dato all'indirizzo specificato.
+     *
+     * @param address indirizzo di memoria da leggere.
+     * @return il valore letto.
+     * @throws MemoryAccessException se l'indirizzo non è valido (negativo o fuori dai limiti).
      */
     @Override
     public int read(int address) throws MemoryAccessException {
-        if(address < 0 || address >= this.size){
-            throw new MemoryAccessException("Invalid index",address, MemoryAccessException.AccessType.READ);
-        }
-        else{
+        if (address < 0 || address >= this.size) {
+            throw new MemoryAccessException("Indice non valido", address, MemoryAccessException.AccessType.READ);
+        } else {
             return this.data[address];
         }
     }
 
     /**
-     * Restituisce una copia sicura dei dati della memoria.
-     * Usiamo clone() per evitare che riferimenti esterni modifichino la RAM reale.
+     * Restituisce una copia sicura dei dati della memoria (dump).
+     *
+     * @return un array contenente una copia dei dati della memoria.
      */
     public int[] getMemoryDump() {
         return data.clone();
     }
+
     /**
-     * Istruzione write dove scrive il dato attraverso il suo address
-     * @param address indirizzo di memoria che vuoi leggere
-     * @param value il valore che vuoi scrivere
-     * @throws MemoryAccessException indirizzo non valido o valore negativo o maggiore della size
+     * Scrive un valore all'indirizzo specificato.
+     *
+     * @param address indirizzo di memoria dove scrivere.
+     * @param value   il valore da scrivere.
+     * @throws MemoryAccessException se l'indirizzo non è valido (negativo o fuori dai limiti).
      */
     @Override
     public void write(int address, int value) throws MemoryAccessException {
-        if(address < 0 || address >= this.size){
-            throw new MemoryAccessException("Invalid index",address, MemoryAccessException.AccessType.WRITE);
-        }
-        else{
+        if (address < 0 || address >= this.size) {
+            throw new MemoryAccessException("Indice non valido", address, MemoryAccessException.AccessType.WRITE);
+        } else {
             this.data[address] = value;
         }
     }
 
     /**
-     * Ritorna la grandezza della memoria virtuale
-     * @return restituisce la size della memoria
+     * Restituisce la dimensione della memoria.
+     *
+     * @return la dimensione della memoria.
      */
     @Override
-    public int sizeMemory() {return size;}
-
-    /**
-     * Pulisce la memoria da i tutti i dati presenti
-     */
-    @Override
-    public void clear() {
-       Arrays.fill(data,0);
+    public int sizeMemory() {
+        return size;
     }
 
     /**
-     * Carica la memoria con il programma che vuoi eseguire
-     * @param program programma con le istruzioni esadecimali
-     * @throws MemoryAccessException Programma troppo grande per la nostra memoria virtuale
+     * Pulisce la memoria impostando tutti i valori a zero.
+     */
+    @Override
+    public void clear() {
+        Arrays.fill(data, 0);
+    }
+
+    /**
+     * Carica un programma in memoria.
+     *
+     * @param program array contenente le istruzioni del programma.
+     * @throws MemoryAccessException se il programma è troppo grande per la memoria disponibile.
      */
     @Override
     public void loadProgram(int[] program) throws MemoryAccessException {
-        if(program.length > this.size) {
-            throw new MemoryAccessException(-1,MemoryAccessException.AccessType.EXECUTE);
-        }
-        else {
+        if (program.length > this.size) {
+            throw new MemoryAccessException(-1, MemoryAccessException.AccessType.EXECUTE);
+        } else {
             System.arraycopy(program, 0, this.data, 0, program.length);
         }
-
     }
 }

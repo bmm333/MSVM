@@ -156,11 +156,11 @@ public class EditorController {
         }
     }
     /** Gestisce il click sul pulsante "Run". Avvia l'esecuzione continua. */
-    @FXML public void onRun() { consoleArea.appendText("\n> Run clicked!"); }
+    @FXML public void onRun() { consoleArea.appendText("\n> Avvio esecuzione!"); }
     /** Gestisce il click sul pulsante "Step". Esegue una singola istruzione. */
-    @FXML public void onStep() { consoleArea.appendText("\n> Step clicked!"); }
+    @FXML public void onStep() { consoleArea.appendText("\n> Esecuzione step!"); }
     /** Gestisce il click sul pulsante "Reset". Ripristina lo stato della VM. */
-    @FXML public void onReset() { consoleArea.appendText("\n> Reset clicked!"); }
+    @FXML public void onReset() { consoleArea.appendText("\n> Reset effettuato!"); }
     /**
      * Imposta il contenuto dell'editor di codice.
      * <p>

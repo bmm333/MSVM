@@ -16,25 +16,24 @@ import java.util.Optional;
  * <p>
  * Questa classe gestisce tutte le operazioni CRUD (Create, Read, Update, Delete)
  * verso il database per la tabella 'users'.
- * </p>
  */
 public class UserDAO {
-
+    /** Gestore del database. */
     private final DatabaseManager dbManager;
 
+    /**
+     * Costruttore che inizializza il gestore del database recuperando l'istanza singleton.
+     */
     public UserDAO() {
-        // Recuperiamo l'istanza singleton
         this.dbManager = DatabaseManager.getInstance();
     }
 
-    // ==================================================================================
-    //                                  READ (Lettura)
-    // ==================================================================================
-
     /**
-     * Cerca un utente tramite ID.
-     * @param userId L'ID dell'utente.
-     * @return L'utente trovato o null.
+     * Cerca un utente tramite il suo identificativo univoco (ID).
+     *
+     * @param userId l'ID dell'utente.
+     * @return l'utente trovato o null se non esiste.
+     * @throws SQLException in caso di errore nel database.
      */
     public User findById(Long userId) throws SQLException {
         String sql = "SELECT id, username, email, password FROM users WHERE id = ?";
@@ -56,9 +55,11 @@ public class UserDAO {
     }
 
     /**
-     * Cerca un utente tramite Email.
-     * @param email L'email da cercare.
-     * @return Optional contenente l'utente se trovato.
+     * Cerca un utente tramite l'indirizzo Email.
+     *
+     * @param email l'email da cercare.
+     * @return un Optional contenente l'utente se trovato, altrimenti vuoto.
+     * @throws SQLException in caso di errore nel database.
      */
     public Optional<User> findByEmail(String email) throws SQLException {
         String sql = "SELECT id, username, email, password FROM users WHERE email = ?";
@@ -80,11 +81,12 @@ public class UserDAO {
     }
 
     /**
-     * Cerca un utente tramite Username.
-     * Fondamentale per il Login.
+     * Cerca un utente tramite il nome utente (Username).
+     * Fondamentale per la procedura di Login.
      *
-     * @param username Lo username da cercare.
-     * @return L'utente trovato o null.
+     * @param username lo username da cercare.
+     * @return l'utente trovato o null se non esiste.
+     * @throws SQLException in caso di errore nel database.
      */
     public User findByUsername(String username) throws SQLException {
         String sql = "SELECT id, username, email, password FROM users WHERE username = ?";
@@ -132,25 +134,37 @@ public class UserDAO {
         return users;
     }
 
-    // ==================================================================================
-    //                                  CREATE (Creazione)
-    // ==================================================================================
-
     /**
-     * Inserisce un nuovo utente.
-     * @param user L'utente da salvare.
-     * @return true se inserito con successo.
+     * Inserisce un nuovo utente nel database.
+     * <p>
+     * Se l'ID dell'utente è {@code null}, viene utilizzato l'autoincremento del database.
+     * </p>
+     *
+     * @param user l'utente da salvare.
+     * @return {@code true} se l'inserimento ha successo, {@code false} altrimenti.
+     * @throws SQLException in caso di errori nel database.
      */
     public boolean insertNewUser(User user) throws SQLException {
-        // NOTA: Se l'ID è autoincrement nel DB, rimuovilo dalla query e dal setLong
-        String sql = "INSERT INTO users (id, username, password, email) VALUES (?, ?, ?, ?)";
+        String sql;
+        if (user.getId() == null) {
+            sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        } else {
+            sql = "INSERT INTO users (id, username, password, email) VALUES (?, ?, ?, ?)";
+        }
+
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setLong(1, user.getId());
-            stmt.setString(2, user.getUsername());
-            stmt.setString(3, user.getPassword());
-            stmt.setString(4, user.getEmail());
+            if (user.getId() == null) {
+                stmt.setString(1, user.getUsername());
+                stmt.setString(2, user.getPassword());
+                stmt.setString(3, user.getEmail());
+            } else {
+                stmt.setLong(1, user.getId());
+                stmt.setString(2, user.getUsername());
+                stmt.setString(3, user.getPassword());
+                stmt.setString(4, user.getEmail());
+            }
 
             return stmt.executeUpdate() == 1;
         } catch (SQLException e) {
@@ -160,10 +174,6 @@ public class UserDAO {
             dbManager.close();
         }
     }
-
-    // ==================================================================================
-    //                                  UPDATE (Aggiornamento)
-    // ==================================================================================
 
     /**
      * Aggiorna i dati di un utente esistente.

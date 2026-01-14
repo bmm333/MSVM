@@ -13,70 +13,71 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Rappresentera l'unita centrale di elaborazione (CPU) dela macchina virtuale
+ * Rappresenta l'unità centrale di elaborazione (CPU) della macchina virtuale.
  * <p>
- *     La cpu implemnta il ciclo fetch-decode-execute ed agisce come {@link it.uniupo.msvm.core.instructions.ExecutionContext }
+ *     La CPU implementa il ciclo fetch-decode-execute ed agisce come {@link it.uniupo.msvm.core.instructions.ExecutionContext}
  *     per le istruzioni, fornendo accesso controllato a memoria e stack.
  * </p>
- * */
-
+ */
 public class Cpu implements ExecutionContext, VmBackend {
+    /** Memoria della macchina virtuale. */
     private final Memory memory;
+    /** Stack degli operandi. */
     private final OperandStack stack;
-    //Registri
-    private int ip=0; //Instruction Pointer
-    private boolean isHalted=false;
-    //Stato per UI (Snapshot)
-    private int lastWrittenAddress=-1; //-1 indica nessuna scrittura recente
-    //Strategy Map per decodificare le istruzioni.
-    private final Map<Opcode, Instruction>instructionSet=new HashMap<>();
+    /** Registro Instruction Pointer (Puntatore all'istruzione successiva). */
+    private int ip = 0;
+    /** Indica se la CPU è in stato di arresto. */
+    private boolean isHalted = false;
+    /** Ultimo indirizzo di memoria scritto (utilizzato per l'interfaccia grafica). */
+    private int lastWrittenAddress = -1;
+    /** Insieme delle istruzioni supportate dalla CPU. */
+    private final Map<Opcode, Instruction> instructionSet = new HashMap<>();
 
     /**
      * Inizializza la CPU con i componenti necessari.
      *
-     * @param memory L'istanza della memoria condivisa.
-     * @param stack  Lo stack degli operandi.
+     * @param memory l'istanza della memoria condivisa.
+     * @param stack  lo stack degli operandi.
      */
     public Cpu(Memory memory, OperandStack stack) {
         this.memory = memory;
         this.stack = stack;
     }
+
     /**
      * Registra una nuova istruzione nel set della CPU.
-     * @param opcode L'opcode associato all'istruzione.
-     * @param implementation La logica dell'istruzione.
+     *
+     * @param opcode         l'opcode associato all'istruzione.
+     * @param implementation la logica dell'istruzione.
      */
-    public void registerInstruction(Opcode opcode,Instruction implementation)
-    {
-        instructionSet.put(opcode,implementation);
+    public void registerInstruction(Opcode opcode, Instruction implementation) {
+        instructionSet.put(opcode, implementation);
     }
+
     /**
      * Avvia il ciclo di esecuzione continuo.
      * Si ferma solo quando viene incontrata un'istruzione HALT o si verifica un errore critico.
      */
-    public void run()
-    {
-        while(!isHalted)
-        {
+    public void run() {
+        while (!isHalted) {
             step();
         }
     }
 
     /**
-     * Esegue un singolo ciclo Fetch-Decode-Execute (Atomico).
+     * Esegue un singolo ciclo Fetch-Decode-Execute (atomico).
      *
-     * @throws it.uniupo.msvm.core.exceptions.VmException Se si verifica un errore durante l'esecuzione (es. Memory Fault, Opcode illegale).
+     * @throws it.uniupo.msvm.core.exceptions.VmException se si verifica un errore durante l'esecuzione.
      */
     public void step() {
         if (isHalted) return;
 
-        //resta il tracking della scrittura all inizio di ogni step
-        //se questa istr non scrive in memoria la ui non deve evidenzionare nulla.
-        this.lastWrittenAddress=-1;
+        // Reset del tracking della scrittura all'inizio di ogni step
+        this.lastWrittenAddress = -1;
 
         // 1. FETCH
         if (ip < 0 || ip >= memory.sizeMemory()) {
-            throw new MemoryAccessException("Segmentation Fault: IP out of bounds",ip, MemoryAccessException.AccessType.READ);
+            throw new MemoryAccessException("Segmentation Fault: IP fuori dai limiti", ip, MemoryAccessException.AccessType.READ);
         }
         int opcodeByte = memory.read(ip);
         ip++; // Incremento IP dopo la lettura dell'opcode
@@ -91,23 +92,21 @@ public class Cpu implements ExecutionContext, VmBackend {
 
         Instruction instruction = instructionSet.get(opcode);
         if (instruction == null) {
-            throw new OpcodeException(opcodeByte); // O una NotImplementedException specifica
+            throw new OpcodeException(opcodeByte);
         }
 
         // 3. EXECUTE
-        // Passiamo 'this' perché Cpu implementa ExecutionContext
         instruction.execute(this);
     }
+
     /**
-     * Resetta lo stato della CPU utile per il tasto Stop/Reset
-     * */
-    public void reset()
-    {
-        this.ip=0;
-        this.isHalted=false;
-        this.lastWrittenAddress=-1;
-        this.stack.clear(); //aggiungo anche il metodo
-        // Nota: La memoria di solito non si resetta qui, ma la si sovrascrive caricando un nuovo programma.
+     * Resetta lo stato della CPU (IP, stato di halt, stack).
+     */
+    public void reset() {
+        this.ip = 0;
+        this.isHalted = false;
+        this.lastWrittenAddress = -1;
+        this.stack.clear();
     }
 
     // --- IMPLEMENTAZIONE EXECUTION CONTEXT ---

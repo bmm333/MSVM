@@ -79,30 +79,94 @@ public class User implements Serializable {
         this.email = email;
     }
 
+    /**
+     * Imposta l'identificativo dell'utente.
+     *
+     * @param id l'identificativo da impostare.
+     */
     public void setId(Long id) {
         this.id = id;
     }
+
+    /**
+     * Restituisce l'identificativo dell'utente.
+     *
+     * @return l'identificativo dell'utente.
+     */
     public Long getId() {
         return id;
     }
+
+    /**
+     * Imposta il nome utente.
+     *
+     * @param username il nome utente da impostare.
+     */
     public void setUsername(String username) {
         this.username = username;
     }
+
+    /**
+     * Restituisce il nome utente.
+     *
+     * @return il nome utente.
+     */
     public String getUsername() {
         return username;
     }
+
+    /**
+     * Imposta la password (o il suo hash).
+     *
+     * @param password la password da impostare.
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * Restituisce la password (o il suo hash).
+     *
+     * @return la password dell'utente.
+     */
     public String getPassword() {
         return password;
     }
+
+    /**
+     * Imposta l'indirizzo email.
+     *
+     * @param email l'indirizzo email da impostare.
+     */
     public void setEmail(String email) {
         this.email = email;
     }
+
+    /**
+     * Restituisce l'indirizzo email.
+     *
+     * @return l'indirizzo email dell'utente.
+     */
     public String getEmail() {
         return email;
+    }
+
+    /**
+     * Imposta il ruolo dell'utente.
+     *
+     * @param role il ruolo da impostare.
+     */
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    /**
+     * Restituisce il ruolo dell'utente.
+     *
+     * @return il ruolo dell'utente.
+     */
+    public String getRole() {
+        return role;
     }
     /**
      * Restituisce una rappresentazione in stringa dell'oggetto User.
