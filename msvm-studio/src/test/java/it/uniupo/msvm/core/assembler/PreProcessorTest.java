@@ -30,7 +30,7 @@ public class PreProcessorTest {
         //Totale righe stimate 1 push + 1 commento + 2 lib + 1 commento + 1 halt = 6 righe
         assertEquals(6,result.size());
         assertTrue(result.contains("PUSH 10"));
-        assertTrue(result.contains("; --- BEGIN IMPORT math/utils ---"));
+        assertTrue(result.contains("; --- INIZIO IMPORT math/utils ---"));
     }
     @Test
     void testRecursiveImport()

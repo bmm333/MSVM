@@ -10,109 +10,116 @@ import java.sql.Statement;
  * Gestore centralizzato del Database SQLite per il Server MSVM.
  * <p>
  *     Implementa il pattern Singleton.
- *     Abilitando WAL e inidici per presetazioni elevetae ,e evitare colli di bottiglia tra Rd e Wr
- *     durante la registrazione e login.
+ *     Abilita la modalità WAL (Write-Ahead Logging) e indici per prestazioni elevate,
+ *     evitando colli di bottiglia tra operazioni di lettura e scrittura.
  * </p>
  * @author Arben Mema
- * */
+ */
 public class DatabaseManager {
 
-    private static final String DB_URL="jdbc:sqlite:msvm_server.db";
-    //Singleton
-    private static  DatabaseManager instance;
+    /** URL di connessione al database SQLite. */
+    private static final String DB_URL = "jdbc:sqlite:msvm_server.db";
+    /** Unica istanza della classe (Singleton). */
+    private static DatabaseManager instance;
+    /** Connessione attiva al database. */
     private Connection connection;
 
     /**
-     * Costruttore private. Carica il driver JDBC.
-     * */
-    private DatabaseManager()
-    {
-        try{
-            //carica il driver
+     * Costruttore privato. Carica il driver JDBC per SQLite.
+     */
+    private DatabaseManager() {
+        try {
             Class.forName("org.sqlite.JDBC");
-        }catch (ClassNotFoundException e){
-            throw new RuntimeException("Critical: Sqlite JDBC driver not found.");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Critico: Driver JDBC SQLite non trovato.");
         }
     }
-    //Singletone access: thread-safe
-    public static synchronized DatabaseManager getInstance()
-    {
-        if(instance==null)
-        {
-            instance=new DatabaseManager();
+
+    /**
+     * Restituisce l'unica istanza di DatabaseManager (thread-safe).
+     *
+     * @return l'istanza di DatabaseManager.
+     */
+    public static synchronized DatabaseManager getInstance() {
+        if (instance == null) {
+            instance = new DatabaseManager();
         }
         return instance;
     }
+
     /**
-     * Ottinee la connessione al db
-     * Se la connesione e chiusa o nulla, ne apre una nuova
-     * */
-    public synchronized Connection getConnection() throws SQLException{
-        if(connection==null||connection.isClosed())
-        {
-            connection= DriverManager.getConnection(DB_URL);
+     * Ottiene la connessione al database.
+     * Se la connessione è chiusa o nulla, ne apre una nuova.
+     *
+     * @return la connessione al database.
+     * @throws SQLException in caso di errori di connessione.
+     */
+    public synchronized Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(DB_URL);
             configSettings(connection);
-            System.out.println("Database connection established.");
+            System.out.println("Connessione al database stabilita.");
         }
         return connection;
     }
+
     /**
-     * Applicando i PRAGMA di SQLite per avere performance migliore e concorrenz (riduciamo p99)
-     * */
-    private void configSettings(Connection connection) throws SQLException{
-        try(Statement stmt= connection.createStatement())
-        {
-            //Abilitiamo WAL per permettere lettura e scrittura concorrenti,
-            //Se wal disabilitato sqlite bloccherebbe tutto il db se qualcuno e in WR
+     * Applica i PRAGMA di SQLite per migliorare le performance e la concorrenza.
+     *
+     * @param connection la connessione da configurare.
+     * @throws SQLException in caso di errori durante l'esecuzione dei comandi SQL.
+     */
+    private void configSettings(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            // Abilitiamo WAL per permettere lettura e scrittura concorrenti
             stmt.execute("PRAGMA journal_mode = WAL;");
-            //synch normal , bilanciato
+            // Sincronizzazione bilanciata
             stmt.execute("PRAGMA synchronous = NORMAL;");
-            //fk abilita i vincoli di integrita ref
+            // Abilita i vincoli di integrità referenziale (Foreign Keys)
             stmt.execute("PRAGMA foreign_keys = ON;");
-            //aumento della cache size per veolocita
+            // Aumento della dimensione della cache per la velocità
             stmt.execute("PRAGMA cache_size = -2000;");
         }
     }
+
     /**
-     * Inizializza lo schema del database (Tabella e indici(
-     * Da chiamare obbligatoriamente all avvio del server
-     * */
-    public void initialize()
-    {
-        System.out.println("Initializing database schema...");
-        //query per la tabella degli utenti
-        String sqlCreateUsers="""
+     * Inizializza lo schema del database (tabelle e indici).
+     * Deve essere chiamato all'avvio del server.
+     */
+    public void initialize() {
+        System.out.println("Inizializzazione dello schema del database...");
+        // Query per la tabella degli utenti
+        String sqlCreateUsers = """
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 email TEXT NOT NULL,
-                password TEXT NOT NULL,  -- Hash della password (BCrypt/SHA)
+                password TEXT NOT NULL,  -- Hash della password
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """;
 
         String sqlCreateLibs = """
-        CREATE TABLE IF NOT EXISTS libraries (
-            name TEXT PRIMARY KEY,
-            content TEXT NOT NULL,
-            description TEXT,
-            version INTEGER DEFAULT 1
-        );
-    """;
+            CREATE TABLE IF NOT EXISTS libraries (
+                name TEXT PRIMARY KEY,
+                content TEXT NOT NULL,
+                description TEXT,
+                version INTEGER DEFAULT 1
+            );
+        """;
 
-        //seeding
+        // Seeding iniziale
         String sqlSeedLib = """
-        INSERT OR IGNORE INTO libraries (name, content, description) 
-        VALUES ('std', '; Standard Library MSVM\n\n:MATH_PI\n PUSH 3\n RET', 'Libreria Standard');
-    """;
+            INSERT OR IGNORE INTO libraries (name, content, description) 
+            VALUES ('std', '; Standard Library MSVM\n\n:MATH_PI\n PUSH 3\n RET', 'Libreria Standard');
+        """;
 
-        //Querry per gli indici
-        //Rende la ricerca per email/username/id O(logN)
+        // Query per gli indici
         String sqlIndexEmail = "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);";
         String sqlIndexUser = "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);";
         String sqlIndexId = "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_id ON users(id);";
 
-        //tabella per tracciare i download delle librerie forse?
+        // Tabella per l'audit dei download
         String sqlCreateAudit = """
             CREATE TABLE IF NOT EXISTS download_audit (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,9 +128,19 @@ public class DatabaseManager {
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """;
-        try(Connection conn=getConnection();
-        Statement stmt=conn.createStatement())
-        {
+
+        String sqlCreateProfiles = """
+            CREATE TABLE IF NOT EXISTS user_profiles (
+                user_id INTEGER PRIMARY KEY,
+                first_name TEXT,
+                last_name TEXT,
+                bio TEXT,
+                phone_number TEXT,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        """;
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
             stmt.execute(sqlCreateUsers);
             stmt.execute(sqlCreateAudit);
             stmt.execute(sqlIndexEmail);
@@ -131,20 +148,22 @@ public class DatabaseManager {
             stmt.execute(sqlIndexId);
             stmt.execute(sqlCreateLibs);
             stmt.execute(sqlSeedLib);
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException("Error initializing database schema: "+e.getMessage());
+            stmt.execute(sqlCreateProfiles);
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore durante l'inizializzazione dello schema del database: " + e.getMessage());
         }
     }
+    /**
+     * Chiude la connessione al database in modo sicuro.
+     */
     public void close() {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("[DB] Connection closed gracefully.");
+                System.out.println("[DB] Connessione chiusa correttamente.");
             }
         } catch (SQLException e) {
-            System.err.println("[DB] Error closing connection: " + e.getMessage());
+            System.err.println("[DB] Errore durante la chiusura della connessione: " + e.getMessage());
         }
     }
 }

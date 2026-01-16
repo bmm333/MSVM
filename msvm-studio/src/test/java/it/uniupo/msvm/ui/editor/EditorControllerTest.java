@@ -11,6 +11,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -139,7 +140,7 @@ public class EditorControllerTest {
     void testRunButtonInteraction(FxRobot robot) {
         robot.clickOn("#btnRun");
         TextArea console = robot.lookup("#consoleArea").queryAs(TextArea.class);
-        assertTrue(console.getText().contains("Run clicked"), "Premendo Run, la console deve mostrare il log di esecuzione");
+        assertTrue(console.getText().contains("Avvio esecuzione"), "Premendo Run, la console deve mostrare il log di esecuzione");
     }
 
     /**
@@ -153,7 +154,7 @@ public class EditorControllerTest {
     void testStepButtonInteraction(FxRobot robot) {
         robot.clickOn("#btnStep");
         TextArea console = robot.lookup("#consoleArea").queryAs(TextArea.class);
-        assertTrue(console.getText().contains("Step clicked"), "Premendo Step, la console deve mostrare il log di debug");
+        assertTrue(console.getText().contains("Esecuzione step"), "Premendo Step, la console deve mostrare il log di debug");
     }
 
     /**
@@ -167,7 +168,7 @@ public class EditorControllerTest {
     void testResetButtonInteraction(FxRobot robot) {
         robot.clickOn("#btnReset");
         TextArea console = robot.lookup("#consoleArea").queryAs(TextArea.class);
-        assertTrue(console.getText().contains("Reset clicked"), "Premendo Stop, la console deve mostrare il log di reset");
+        assertTrue(console.getText().contains("Reset effettuato"), "Premendo Stop, la console deve mostrare il log di reset");
     }
 
     // =================================================================================

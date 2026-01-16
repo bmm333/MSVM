@@ -78,40 +78,93 @@ public class UserProfile implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setFirstName(String firstName){
-        this.firstName=firstName;
+    /**
+     * Imposta il nome di battesimo dell'utente.
+     *
+     * @param firstName il nome da impostare.
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
-    public String getFirstName(){
+
+    /**
+     * Restituisce il nome di battesimo dell'utente.
+     *
+     * @return il nome di battesimo.
+     */
+    public String getFirstName() {
         return firstName;
     }
 
-    public void setUserId(Long userId){
-        this.userId=userId;
+    /**
+     * Imposta l'ID dell'utente associato.
+     *
+     * @param userId l'ID utente da impostare.
+     */
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
-    public Long getUserId(){
+
+    /**
+     * Restituisce l'ID dell'utente associato.
+     *
+     * @return l'ID utente.
+     */
+    public Long getUserId() {
         return userId;
     }
 
-    public void setLastName(String lastName){
-        this.lastName=lastName;
+    /**
+     * Imposta il cognome dell'utente.
+     *
+     * @param lastName il cognome da impostare.
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
-    public String getLastName(){
+
+    /**
+     * Restituisce il cognome dell'utente.
+     *
+     * @return il cognome dell'utente.
+     */
+    public String getLastName() {
         return lastName;
     }
 
-    public void setBio(String bio){
-        this.bio=bio;
+    /**
+     * Imposta la biografia dell'utente.
+     *
+     * @param bio la biografia da impostare.
+     */
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
-    public String getBio(){
+    /**
+     * Restituisce la biografia dell'utente.
+     *
+     * @return la biografia.
+     */
+    public String getBio() {
         return bio;
     }
 
-    public void setPhoneNumber(String phoneNumber){
-        this.phoneNumber=phoneNumber;
+    /**
+     * Imposta il numero di telefono dell'utente.
+     *
+     * @param phoneNumber il numero di telefono da impostare.
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public String getPhoneNumber(){
+    /**
+     * Restituisce il numero di telefono dell'utente.
+     *
+     * @return il numero di telefono.
+     */
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 

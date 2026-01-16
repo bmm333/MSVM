@@ -6,9 +6,9 @@ import it.uniupo.msvm.core.instructions.Opcode;
 import java.util.*;
 
 /**
- * The Assembler class is responsible for assembling assembly-like language into bytecode.
- * It processes source code, parses its instructions, and outputs a corresponding
- * bytecode array. The assembler supports labels, instructions, and optional preprocessing.
+ * La classe Assembler è responsabile della conversione del linguaggio assembly in bytecode.
+ * Elabora il codice sorgente, analizza le istruzioni e genera un array di bytecode corrispondente.
+ * L'assemblatore supporta etichette (label), istruzioni e preprocessing opzionale.
  */
 public class Assembler {
     /**
@@ -17,94 +17,84 @@ public class Assembler {
      */
     private final Map<String, Integer> symbolTable = new HashMap<>();
 
+    /** Preprocessore per la gestione di direttive come @import. */
     private final Preprocessor preprocessor;
 
+    /**
+     * Costruttore predefinito.
+     */
     public Assembler() {
         this(null);
     }
 
+    /**
+     * Costruttore con preprocessor.
+     *
+     * @param preprocessor il preprocessore da utilizzare.
+     */
     public Assembler(Preprocessor preprocessor) {
         this.preprocessor = preprocessor;
     }
 
-
     /**
-     * Entry point di convenienza per compilare codice sorgente fornito come stringa grezza.
+     * Punto di ingresso per compilare codice sorgente fornito come stringa.
      * <p>
-     * Questo metodo funge da wrapper: normalizza l'input dividendolo in righe (basandosi sul carattere
-     * di fine riga) e delega l'elaborazione al metodo principale {@link #assemble(List)}.
-     * </p>
-     * <p>
-     * <b>Nota:</b> Anche utilizzando questo metodo, la pipeline completa (incluso il Preprocessing
-     * e la risoluzione degli {@code @import}) viene eseguita regolarmente.
+     * Questo metodo normalizza l'input dividendolo in righe e delega l'elaborazione
+     * al metodo principale {@link #assemble(List)}.
      * </p>
      *
-     * @param source Il codice Assembly completo sotto forma di stringa unica.
-     * @return L'array di bytecode generato. Restituisce un array vuoto se l'input è null o vuoto.
-     * @throws VmException In caso di errori di sintassi, label duplicate o dipendenze mancanti
-     * propagati dalla pipeline principale.
-     * @see #assemble(List)
+     * @param source il codice Assembly completo come stringa unica.
+     * @return l'array di bytecode generato. Restituisce un array vuoto se l'input è null o vuoto.
+     * @throws VmException in caso di errori di sintassi, label duplicate o dipendenze mancanti.
      */
     public int[] assemble(String source) {
         if (source == null || source.isBlank()) {
             return new int[0];
         }
-        // Wrapper: converte in lista e chiama il metodo "vero"
         return assemble(Arrays.asList(source.split("\n")));
     }
+
     /**
-     * Entry point  che accetta una lista di righe di codice.
+     * Punto di ingresso principale che accetta una lista di righe di codice.
      * <p>
      * Questo metodo orchestra l'intera pipeline di compilazione:
      * <ol>
-     * <li><b>Preprocessing:</b> Se un preprocessor è configurato, espande gli import e processa le macro.</li>
-     * <li><b>Assemblaggio:</b> Esegue la logica standard a due passaggi (Two-Pass) sui dati processati.</li>
+     * <li><b>Preprocessing:</b> Se configurato, espande gli import e processa le macro.</li>
+     * <li><b>Assemblaggio:</b> Esegue la logica standard a due passaggi (Two-Pass).</li>
      * </ol>
      * </p>
      *
-     * @param lines Le righe del codice sorgente (potenzialmente contenenti direttive come {@code @import}).
-     * @return L'array di bytecode compilato pronto per l'esecuzione.
-     * @throws VmException se si verificano errori durante il preprocessing (es. libreria non trovata)
-     * o durante l'assemblaggio (es. sintassi errata, label duplicate).
+     * @param lines le righe del codice sorgente.
+     * @return l'array di bytecode compilato.
+     * @throws VmException se si verificano errori durante il preprocessing o l'assemblaggio.
      */
-    public int[] assemble(List<String>lines)
-    {
-        //prima fase Preprocessing
-        if(preprocessor!=null)
-        {
-            try{
-                lines=preprocessor.process(lines);
-            }catch (Exception e){
-                throw new VmException("Preprocessor Error: " + e.getMessage());
+    public int[] assemble(List<String> lines) {
+        // prima fase Preprocessing
+        if (preprocessor != null) {
+            try {
+                lines = preprocessor.process(lines);
+            } catch (Exception e) {
+                throw new VmException("Errore del preprocessore: " + e.getMessage());
             }
         }
-        //Seconda fase Assemblaggio (Core logic)
-        //converto in array per mantenere compatibilita con la logica precedente
-        String[] linesArray=lines.toArray(new String[0]);
+        // Seconda fase Assemblaggio (Core logic)
+        String[] linesArray = lines.toArray(new String[0]);
         symbolTable.clear();
 
-        try{
-            //mappatura label (firstpass)
+        try {
+            // mappatura label (first pass)
             firstPass(linesArray);
-            //Generazione Bytecode(Secondpass)
+            // Generazione Bytecode (second pass)
             return secondPass(linesArray);
-        }catch (Exception e){
-            //Evitiamo di wrappare una vmexception dentro un altra
-            if(e instanceof VmException) throw (VmException)e;
-            throw new VmException("Assembler Error: " + e.getMessage());
+        } catch (Exception e) {
+            if (e instanceof VmException) throw (VmException) e;
+            throw new VmException("Errore dell'assemblatore: " + e.getMessage());
         }
     }
 
     /**
      * Esegue il primo passaggio (First Pass).
-     * Scopo: Popolare la {@link #symbolTable} con gli indirizzi delle etichette.
-     * <p>
-     * Logica: Simula la generazione del codice incrementando un contatore (program counter)
-     * per ogni istruzione e argomento, senza scrivere nulla. Quando trova una label (es. "LOOP:"),
-     * salva la posizione corrente nella mappa.
-     * V1.1 del first pass include anche lindirizzo della riga per errori per un migliore DX (dev experience),
-     * popolando la {@link #symbolTable} con indirizzi delle etichette.
-     * </p>
+     * Popola la {@link #symbolTable} con gli indirizzi delle etichette.
      *
      * @param lines le righe del codice sorgente.
      */
