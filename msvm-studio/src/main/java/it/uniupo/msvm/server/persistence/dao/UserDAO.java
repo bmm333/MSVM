@@ -112,7 +112,7 @@ public class UserDAO {
      * @return Una lista di utenti (potrebbe essere vuota).
      */
     public List<User> findAll() throws SQLException {
-        String sql = "SELECT id, username, email, password FROM users";
+        String sql = "SELECT id, username, email FROM users";
         List<User> users = new ArrayList<>();
 
         try (Connection conn = dbManager.getConnection();
@@ -177,15 +177,14 @@ public class UserDAO {
      * @throws SQLException Errore database.
      */
     public boolean updateUser(User user) throws SQLException {
-        String sql = "UPDATE users SET username = ?, password = ?, email = ? WHERE id = ?";
+        String sql = "UPDATE users SET username = ?, email = ? WHERE id = ?";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword());
-            stmt.setString(3, user.getEmail());
-            stmt.setLong(4, user.getId()); // WHERE id = ?
+            stmt.setString(2, user.getEmail());
+            stmt.setLong(3, user.getId()); // WHERE id = ?
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;

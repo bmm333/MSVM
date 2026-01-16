@@ -1,5 +1,6 @@
 package it.uniupo.msvm.common.api;
 
+import it.uniupo.msvm.common.dto.FullProfileDTO;
 import it.uniupo.msvm.common.dto.UserDTO;
 import it.uniupo.msvm.common.model.User;
 

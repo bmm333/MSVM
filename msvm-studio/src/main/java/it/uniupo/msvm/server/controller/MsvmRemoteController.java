@@ -1,6 +1,7 @@
 package it.uniupo.msvm.server.controller;
 
 import it.uniupo.msvm.common.api.MsvmRemoteService;
+import it.uniupo.msvm.common.dto.FullProfileDTO;
 import it.uniupo.msvm.common.dto.UserDTO;
 import it.uniupo.msvm.server.services.AuthService;
 import it.uniupo.msvm.server.services.LibraryService;
