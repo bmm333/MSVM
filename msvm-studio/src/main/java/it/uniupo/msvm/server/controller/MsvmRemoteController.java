@@ -5,6 +5,7 @@ import it.uniupo.msvm.common.dto.FullProfileDTO;
 import it.uniupo.msvm.common.dto.UserDTO;
 import it.uniupo.msvm.server.services.AuthService;
 import it.uniupo.msvm.server.services.LibraryService;
+import it.uniupo.msvm.server.services.UserProfileService;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -21,6 +22,7 @@ public class MsvmRemoteController extends UnicastRemoteObject implements MsvmRem
     private final AuthService authService;
     /** Servizio per la gestione delle librerie. */
     private final LibraryService libService;
+    private final UserProfileService userProfileService;
 
     /**
      * Costruttore che inizializza i servizi necessari.
@@ -31,6 +33,7 @@ public class MsvmRemoteController extends UnicastRemoteObject implements MsvmRem
         super();
         this.authService = new AuthService();
         this.libService = new LibraryService();
+        this.userProfileService=new UserProfileService();
     }
 
     /**
@@ -69,6 +72,30 @@ public class MsvmRemoteController extends UnicastRemoteObject implements MsvmRem
         } catch (Exception e) {
             System.err.println("[RMI Errore] Registrazione fallita: " + e.getMessage());
             throw new RemoteException(e.getMessage());
+        }
+    }
+
+    @Override
+    public FullProfileDTO getProfile(Long userId) throws RemoteException {
+        try {
+            System.out.println("[RMI] Richiesta profilo ID: " + userId);
+            // Delega al service
+            return userProfileService.getFullProfile(userId);
+        } catch (Exception e) {
+            System.err.println("Errore getProfile: " + e.getMessage());
+            throw new RemoteException("Impossibile recuperare il profilo: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean updateProfile(FullProfileDTO profileDto) throws RemoteException {
+        try {
+            System.out.println("[RMI] Update profilo ID: " + profileDto.getUserId());
+            // Delega al service
+            return userProfileService.updateFullProfile(profileDto);
+        } catch (Exception e) {
+            System.err.println("Errore updateProfile: " + e.getMessage());
+            throw new RemoteException("Aggiornamento fallito: " + e.getMessage());
         }
     }
 

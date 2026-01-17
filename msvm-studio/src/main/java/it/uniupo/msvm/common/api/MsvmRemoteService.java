@@ -20,6 +20,8 @@ public interface MsvmRemoteService extends Remote{
     //forse dobbiamo definire sia email che username? per un ux migliore magari possiamo gestirlo in un altro punto e qua normalizziamo
     UserDTO login(String email, String password) throws RemoteException;
     UserDTO register(String email, String username, String password) throws RemoteException;
+    public boolean updateProfile(FullProfileDTO profileDto) throws RemoteException;
+    public FullProfileDTO getProfile(Long userId) throws RemoteException;
     //Library
     /**
      * scarica solo il codice sorgente

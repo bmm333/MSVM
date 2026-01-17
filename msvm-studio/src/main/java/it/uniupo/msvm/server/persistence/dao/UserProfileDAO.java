@@ -53,8 +53,6 @@ public class UserProfileDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore inserimento profilo: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -85,8 +83,6 @@ public class UserProfileDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore ricerca profilo per ID: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
         return null;
     }
@@ -107,8 +103,6 @@ public class UserProfileDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -142,8 +136,6 @@ public class UserProfileDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore update profilo: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -171,8 +163,6 @@ public class UserProfileDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore delete profilo: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 

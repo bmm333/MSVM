@@ -10,7 +10,7 @@
 
 <VBox alignment="CENTER" spacing="20.0" styleClass="main-bg" stylesheets="@login.css"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.uniupo.msvm.ui.controllers.RegistrazioneController">
+      fx:controller="it.uniupo.msvm.ui.controllers.auth.RegistrazioneController">
 
     <VBox alignment="CENTER" maxWidth="-Infinity" prefWidth="380.0" spacing="15.0" styleClass="login-card">
         <padding>
