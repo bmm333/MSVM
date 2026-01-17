@@ -48,8 +48,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore findById: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
         return null;
     }
@@ -74,8 +72,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore findByEmail: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
         return Optional.empty();
     }
@@ -101,8 +97,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore findByUsername: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
         return null;
     }
@@ -128,8 +122,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore findAll: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
         return users;
     }
@@ -170,8 +162,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore insertNewUser: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -202,8 +192,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore updateUser: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -222,8 +210,6 @@ public class UserDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -247,8 +233,6 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("[DAO] Errore deleteUser: " + e.getMessage());
             throw e;
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -268,8 +252,6 @@ public class UserDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
-        } finally {
-            dbManager.close();
         }
     }
 
@@ -284,8 +266,6 @@ public class UserDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
-        } finally {
-            dbManager.close();
         }
     }
 

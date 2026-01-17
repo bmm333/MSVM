@@ -73,18 +73,28 @@ public class AuthService {
      * @throws RuntimeException          se si verifica un errore durante la registrazione.
      */
     public UserDTO registerUser(String username, String email, String rawPassword) throws SQLException {
-        // Validazione dati
         if (rawPassword == null || rawPassword.length() < 8) {
             throw new IllegalArgumentException("Password troppo corta (minimo 8 caratteri)");
         }
-        // Hashing
+        if (userDAO.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email già registrata nel sistema.");
+        }
+        if (userDAO.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username già in uso.");
+        }
         String hashedPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt(WORK_FACTOR));
         User newUser = new User(null, username, hashedPassword, email);
         boolean success = userDAO.insertNewUser(newUser);
         if (!success) {
-            throw new RuntimeException("Errore durante la registrazione");
+            throw new RuntimeException("Errore generico durante la registrazione (Database Error)");
         }
-        System.out.println("[AuthService] Registrazione avvenuta con successo per: " + email);
-        return new UserDTO(null, username, email);
+        //Recupero l'ID appena generato
+        // Dato che l'insert ha avuto successo, findByEmail DEVE trovare l'utente.
+        User savedUser = userDAO.findByEmail(email)
+                .orElseThrow(() -> new SQLException("Errore critico: Utente inserito ma non trovato."));
+
+        System.out.println("[AuthService] Registrazione completata. Nuovo ID: " + savedUser.getId());
+        // Aggiornato ora ritorna il DTO completto con id incluso
+        return new UserDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
     }
 }
